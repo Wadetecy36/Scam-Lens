@@ -1,0 +1,21 @@
+# ScamLens
+
+ScamLens is a parent-focused AI safety check for suspicious messages, screenshots, links, and descriptions of calls or conversations.
+
+## Purpose
+Help people understand common scam warning signs and decide on safer next steps before clicking, paying, replying, or sharing information.
+
+## Supported inputs
+- Pasted messages
+- Screenshots (foundation only in Phase 1)
+- HTTP/HTTPS URLs (shape validation only in Phase 1)
+- Descriptions of suspicious calls or conversations
+
+## Limitations
+ScamLens is a second opinion, not a guarantee. AI analysis can be wrong and should not replace independent verification through trusted official channels.
+
+## Privacy principles
+Phase 1 keeps full result data in session memory and stores only lightweight metadata when a user explicitly saves a result to local history. ScamLens should never request passwords, PINs, OTPs, or recovery codes.
+
+## Product roadmap boundary
+Real AI provider integration, OCR, authentication, billing, family invitations, notifications, and organizational/API features are planned for later phases and are not represented as active Phase 1 capabilities.

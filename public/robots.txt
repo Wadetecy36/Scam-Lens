@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /result/
+
+Sitemap: https://scamlens.example.com/sitemap.xml

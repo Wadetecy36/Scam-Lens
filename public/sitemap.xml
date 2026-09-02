@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://scamlens.example.com/</loc></url>
+  <url><loc>https://scamlens.example.com/analyze</loc></url>
+  <url><loc>https://scamlens.example.com/analyze/message</loc></url>
+  <url><loc>https://scamlens.example.com/analyze/image</loc></url>
+  <url><loc>https://scamlens.example.com/analyze/url</loc></url>
+  <url><loc>https://scamlens.example.com/analyze/call</loc></url>
+  <url><loc>https://scamlens.example.com/history</loc></url>
+  <url><loc>https://scamlens.example.com/settings</loc></url>
+  <url><loc>https://scamlens.example.com/family</loc></url>
+  <url><loc>https://scamlens.example.com/about</loc></url>
+  <url><loc>https://scamlens.example.com/privacy</loc></url>
+  <url><loc>https://scamlens.example.com/terms</loc></url>
+</urlset>
