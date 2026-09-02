@@ -37,3 +37,15 @@ npm run preview
 ```
 
 Do not treat Phase 1 as verified until those commands pass cleanly.
+
+
+## Vercel build fixes applied
+
+The following TypeScript/Vite 8 compatibility issues reported by Vercel were fixed in the working bundle:
+- Removed deprecated TypeScript 6 `baseUrl` from `tsconfig.app.json` while retaining the `@/*` path alias.
+- Replaced object-form Rollup `manualChunks` with a typed function in `vite.config.ts`.
+- Replaced the TypeScript 6-incompatible parameter property in `AnalysisRequestError` with an explicit class field.
+- Removed the unused `Button` import from `ImageAnalyzePage.tsx`.
+- Added `result_saved` to the analytics event union.
+
+The build could not be executed in this packaging environment because npm registry packages are not cached here. The Vercel environment is the authoritative dependency/build verification environment.

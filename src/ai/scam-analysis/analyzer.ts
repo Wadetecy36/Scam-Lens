@@ -12,11 +12,11 @@ export interface AIProvider {
 }
 
 export class AnalysisRequestError extends Error {
-  constructor(
-    message: string,
-    public readonly cause?: unknown,
-  ) {
+  readonly cause?: unknown;
+
+  constructor(message: string, cause?: unknown) {
     super(message);
     this.name = "AnalysisRequestError";
+    this.cause = cause;
   }
 }

@@ -5,6 +5,7 @@ export type AnalyticsEvent =
   | "analysis_completed"
   | "analysis_failed"
   | "result_viewed"
+  | "result_saved"
   | "simple_explanation_used"
   | "read_aloud_used"
   | "family_request_started"

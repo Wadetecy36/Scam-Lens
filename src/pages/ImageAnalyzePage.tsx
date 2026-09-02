@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Upload, X } from "lucide-react";
-import { Button, buttonClasses } from "@/components/ui/Button";
+import { buttonClasses } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { AnalysisInputPage } from "@/pages/AnalysisInputPage";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
