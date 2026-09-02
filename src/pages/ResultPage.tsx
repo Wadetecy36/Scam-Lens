@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Users, Bookmark, BookmarkCheck, ChevronDown, ShieldCheck } from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
-import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { ReadAloudButton } from "@/components/voice/ReadAloudButton";
@@ -19,14 +18,13 @@ export function ResultPage() {
   useDocumentHead({ title: result ? "Your ScamLens result" : "Result unavailable", description: result ? "See what ScamLens recommends you do next." : "This ScamLens result is no longer available in this session.", path: `/result/${id ?? "unknown"}`, index: false });
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saved, setSaved] = useState(() => !!id && listHistory().some((entry) => entry.id === id));
-  const { isSimple } = useUxMode();
+  useUxMode();
 
   if (!result) {
     return <main className="container-page py-14"><Alert tone="warning" title="This result is no longer available.">Results are kept in this session only. If you refreshed the page, check it again to create a new result.</Alert><Link to="/analyze" className="mt-5 inline-flex"><Button>Check something</Button></Link></main>;
   }
 
   const { analysis } = result;
-  const explanation = isSimple ? analysis.explanations.simple : analysis.explanations.technical;
   const topAction = analysis.recommendedActions[0] ?? "Don't click, reply, or send money until you've verified it.";
 
   function save() {
