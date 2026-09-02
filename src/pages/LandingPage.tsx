@@ -52,15 +52,12 @@ export function LandingPage() {
           Before you click, <span className="text-pine">check.</span>
         </p>
         <p className="mt-4 max-w-md text-lg text-ink-soft">
-          Use AI to check suspicious messages, links, screenshots, and online requests before you act on them.
+          Not sure about something you received? Check it before you click, reply, or pay.
         </p>
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6">
           <Link to="/analyze" className={buttonClasses({ size: "lg" })}>
             Check something
           </Link>
-          <a href="#how-it-works" className={buttonClasses({ variant: "secondary", size: "lg" })}>
-            How it works
-          </a>
         </div>
 
         {/* Live-feeling product preview — the hero visual */}

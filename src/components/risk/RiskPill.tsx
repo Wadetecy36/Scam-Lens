@@ -50,7 +50,7 @@ export function RiskPill({ level, score, size = "sm", className }: RiskPillProps
 }
 
 /** Full risk header for the result screen: pill, ramp position, and description — three channels, never color alone. */
-export function RiskHeader({ level, score }: { level: RiskLevel; score: number }) {
+export function RiskHeader({ level, score, showScale = true }: { level: RiskLevel; score: number; showScale?: boolean }) {
   const meta = RISK_META[level];
   const copy = RISK_LEVEL_COPY[level];
   const Icon = meta.icon;
@@ -67,20 +67,22 @@ export function RiskHeader({ level, score }: { level: RiskLevel; score: number }
         </div>
       </div>
 
-      <div className="mt-3">
-        <div className="relative h-1.5 w-full rounded-full bg-ink/10">
-          <div
-            className={cn("absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-sm", meta.text)}
-            style={{ left: `${meta.position}%`, backgroundColor: "currentColor" }}
-          />
+      {showScale && (
+        <div className="mt-3">
+          <div className="relative h-1.5 w-full rounded-full bg-ink/10">
+            <div
+              className={cn("absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-sm", meta.text)}
+              style={{ left: `${meta.position}%`, backgroundColor: "currentColor" }}
+            />
+          </div>
+          <div className="mt-1.5 flex justify-between text-xs text-ink-soft">
+            <span>Low</span>
+            <span>Caution</span>
+            <span>Suspicious</span>
+            <span>High</span>
+          </div>
         </div>
-        <div className="mt-1.5 flex justify-between text-xs text-ink-soft">
-          <span>Low</span>
-          <span>Caution</span>
-          <span>Suspicious</span>
-          <span>High</span>
-        </div>
-      </div>
+      )}
 
       <p className="sr-only">Numeric risk score: {Math.round(score)} out of 100.</p>
     </div>
