@@ -160,9 +160,9 @@ export function LandingPage() {
           <Link
             to="/analyze"
             className={buttonClasses({
-              variant: "secondary",
+              variant: "light",
               size: "lg",
-              className: "mt-5 border-paper/40 bg-paper text-pine hover:bg-paper/90",
+              className: "mt-5",
             })}
           >
             Check something

@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Users, Bookmark, BookmarkCheck, ChevronDown, ShieldCheck } from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
-import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Button, buttonClasses } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { ReadAloudButton } from "@/components/voice/ReadAloudButton";
 import { getResult } from "@/lib/result-store";
@@ -18,13 +19,14 @@ export function ResultPage() {
   useDocumentHead({ title: result ? "Your ScamLens result" : "Result unavailable", description: result ? "See what ScamLens recommends you do next." : "This ScamLens result is no longer available in this session.", path: `/result/${id ?? "unknown"}`, index: false });
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saved, setSaved] = useState(() => !!id && listHistory().some((entry) => entry.id === id));
-  useUxMode();
+  const { isSimple } = useUxMode();
 
   if (!result) {
     return <main className="container-page py-14"><Alert tone="warning" title="This result is no longer available.">Results are kept in this session only. If you refreshed the page, check it again to create a new result.</Alert><Link to="/analyze" className="mt-5 inline-flex"><Button>Check something</Button></Link></main>;
   }
 
   const { analysis } = result;
+  const explanation = isSimple ? analysis.explanations.simple : analysis.explanations.technical;
   const topAction = analysis.recommendedActions[0] ?? "Don't click, reply, or send money until you've verified it.";
 
   function save() {
@@ -88,7 +90,7 @@ export function ResultPage() {
       </div>
 
       <section className="mt-8 rounded-[var(--radius-card)] bg-pine px-5 py-6 text-paper">
-        <div className="flex items-start gap-3"><Users aria-hidden="true" className="mt-1 shrink-0" size={22} /><div><h2 className="font-display text-xl text-paper">Not sure? Ask someone you trust.</h2><p className="mt-1 text-sm text-paper/80">A family member can be a second pair of eyes. This is optional.</p><Link to="/family" className="mt-4 inline-flex"><Button variant="secondary" className="border-paper/40 bg-paper text-pine hover:bg-paper/90">Ask someone you trust</Button></Link></div></div>
+        <div className="flex items-start gap-3"><Users aria-hidden="true" className="mt-1 shrink-0" size={22} /><div><h2 className="font-display text-xl text-paper">Not sure? Ask someone you trust.</h2><p className="mt-1 text-sm text-paper/80">A family member can be a second pair of eyes. This is optional.</p><Link to="/family" className={buttonClasses({ variant: "light", size: "md", className: "mt-4" })}>Ask someone you trust</Link></div></div>
       </section>
 
       <Link to="/history" className="mt-5 inline-flex tap-target items-center text-sm font-medium text-pine hover:text-pine-dark">View saved checks</Link>
