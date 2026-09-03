@@ -1,5 +1,7 @@
+import type { ScamAnalysis } from "../../src/ai/scam-analysis/schema.js";
 import { scoreSignals } from "./scorer.js";
-import type { RiskSignal } from "./signals.js";
+import { extractAISignals } from "./ai-evidence.js";
+import type { DetectedSignal, RiskSignal } from "./signals.js";
 
 interface SignalRule {
   signal: RiskSignal;
@@ -85,4 +87,36 @@ export function analyzeSignals(content: string) {
     }));
 
   return scoreSignals(signals);
+}
+
+export function analyzeCombinedRisk(
+  content: string,
+  aiAnalysis: ScamAnalysis,
+) {
+  const deterministic = analyzeSignals(content);
+  const aiSignals = extractAISignals(aiAnalysis);
+
+  const merged = new Map<RiskSignal, DetectedSignal>();
+
+  for (const signal of deterministic.signals) {
+    merged.set(signal.signal, signal);
+  }
+
+  for (const signal of aiSignals) {
+    if (!merged.has(signal.signal)) {
+      merged.set(signal.signal, {
+        ...signal,
+        weight: 0,
+      });
+    }
+  }
+
+  const combined = scoreSignals(
+    [...merged.values()].map(({ signal, explanation }) => ({
+      signal,
+      explanation,
+    })),
+  );
+
+  return combined;
 }
