@@ -34,6 +34,15 @@ export function parseScamAnalysis(input: unknown): ScamAnalysis {
   assert(typeof input === "object" && input !== null, "Analysis payload is not an object");
   const obj = input as Record<string, unknown>;
 
+  console.log(
+    "VALIDATOR schemaVersion:",
+    obj.schemaVersion,
+    "type:",
+    typeof obj.schemaVersion,
+    "equals 1:",
+    obj.schemaVersion === 1,
+  );
+
   assert(obj.schemaVersion === 1, "Unsupported or missing schemaVersion");
   assert(isString(obj.id) && obj.id.length > 0, "Missing analysis id");
   assert(isString(obj.inputType), "Missing inputType");
