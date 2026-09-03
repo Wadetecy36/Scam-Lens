@@ -8,6 +8,7 @@ import { parseScamAnalysis } from "../../src/ai/scam-analysis/validators.js";
 import { AnalysisRequestError } from "../../src/ai/scam-analysis/analyzer.js";
 import { SCAMLENS_ANALYZER_V1 } from "../../src/ai/scam-analysis/prompts.js";
 import type { ServerAIProvider } from "./ai-provider.js";
+import { normalizeWarningSigns } from "./normalize-ai-output.js";
 
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const REQUEST_TIMEOUT_MS = 20_000;
@@ -246,6 +247,12 @@ export class GeminiAIProvider implements ServerAIProvider {
 
       // ScamLens owns these fields.
       result.schemaVersion = 1;
+
+      // Normalize occasional Gemini string warning signs
+      // before strict schema validation.
+      result.warningSigns = normalizeWarningSigns(
+        result.warningSigns,
+      );
 
       // The ScamLens schema stores confidence as 0..1.
       // If Gemini returns a percentage such as 95, normalize it.
