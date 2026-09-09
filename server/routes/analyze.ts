@@ -2,34 +2,40 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { sendError, sendJson } from "../http.js";
 import { parseAnalyzeRequest } from "../validation/analyze.js";
 import { getAIProvider } from "../providers/index.js";
+import { analyzeCombinedRisk } from "../risk/engine.js";
 import type { ScamAnalysisInput } from "../../src/ai/scam-analysis/schema.js";
 
 const MAX_BODY_BYTES = 25_000;
 
 async function readBody(req: IncomingMessage): Promise<unknown> {
-  let data = "";
-  let size = 0;
+  return new Promise((resolve, reject) => {
+    let body = "";
+    let size = 0;
 
-  for await (const chunk of req) {
-    const text = chunk.toString();
-    size += Buffer.byteLength(text);
+    req.setEncoding("utf8");
 
-    if (size > MAX_BODY_BYTES) {
-      throw new Error("Request body is too large.");
-    }
+    req.on("data", (chunk: string) => {
+      size += Buffer.byteLength(chunk, "utf8");
 
-    data += text;
-  }
+      if (size > MAX_BODY_BYTES) {
+        reject(new Error("Request body is too large."));
+        req.destroy();
+        return;
+      }
 
-  if (!data.trim()) {
-    throw new Error("Request body is required.");
-  }
+      body += chunk;
+    });
 
-  try {
-    return JSON.parse(data);
-  } catch {
-    throw new Error("Request body must contain valid JSON.");
-  }
+    req.on("end", () => {
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(new Error("Invalid JSON body."));
+      }
+    });
+
+    req.on("error", reject);
+  });
 }
 
 function toAIInput(
@@ -72,7 +78,27 @@ export async function handleAnalyze(
     const aiInput = toAIInput(input);
 
     const provider = getAIProvider();
-    const analysis = await provider.analyzeScam(aiInput);
+    const aiAnalysis = await provider.analyzeScam(aiInput);
+
+    const content = input.content;
+
+    /*
+     * ScamLens owns the final risk decision.
+     *
+     * Gemini provides evidence.
+     * The deterministic risk engine calculates
+     * the final score and risk level.
+     */
+    const risk = analyzeCombinedRisk(
+      content,
+      aiAnalysis,
+    );
+
+    const analysis = {
+      ...aiAnalysis,
+      riskScore: risk.score,
+      riskLevel: risk.level,
+    };
 
     sendJson(res, 200, {
       ok: true,
@@ -82,28 +108,26 @@ export async function handleAnalyze(
     const message =
       error instanceof Error
         ? error.message
-        : "Analysis request failed.";
+        : "Unknown analysis error.";
 
-    if (
-      message.includes("not configured")
-    ) {
+    console.error("Analyze route error:", error);
+
+    if (message.includes("not configured")) {
       sendError(
         res,
         503,
         "AI_NOT_CONFIGURED",
-        "The AI analysis service is not configured.",
+        "AI analysis is not configured.",
       );
       return;
     }
 
-    if (
-      message.includes("timed out")
-    ) {
+    if (message.includes("timed out")) {
       sendError(
         res,
         504,
         "AI_TIMEOUT",
-        "The analysis service took too long to respond.",
+        "AI analysis timed out.",
       );
       return;
     }
@@ -116,18 +140,36 @@ export async function handleAnalyze(
         res,
         502,
         "AI_INVALID_RESPONSE",
-        "The analysis service returned an invalid response.",
+        "The AI returned an invalid response.",
       );
       return;
     }
 
-    console.error("Analysis request error:", error);
+    if (message === "Request body is too large.") {
+      sendError(
+        res,
+        413,
+        "REQUEST_TOO_LARGE",
+        "The request is too large.",
+      );
+      return;
+    }
+
+    if (message === "Invalid JSON body.") {
+      sendError(
+        res,
+        400,
+        "INVALID_JSON",
+        "The request body must contain valid JSON.",
+      );
+      return;
+    }
 
     sendError(
       res,
       502,
       "AI_ANALYSIS_FAILED",
-      "We could not complete the analysis right now.",
+      "Scam analysis failed.",
     );
   }
 }
