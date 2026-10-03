@@ -62,20 +62,20 @@ export function RiskHeader({ level, score, showScale = true }: { level: RiskLeve
           <Icon aria-hidden="true" size={24} strokeWidth={2.25} />
         </span>
         <div>
-          <p className={cn("font-display text-xl leading-tight", meta.text)}>{copy.label}</p>
-          <p className="text-sm text-ink-soft">{copy.description}</p>
+          <p className={cn("font-heading text-xl leading-tight", meta.text)}>{copy.label}</p>
+          <p className="text-sm text-foreground-soft">{copy.description}</p>
         </div>
       </div>
 
       {showScale && (
         <div className="mt-3">
-          <div className="relative h-1.5 w-full rounded-full bg-ink/10">
+          <div className="relative h-1.5 w-full rounded-full bg-foreground/10">
             <div
               className={cn("absolute top-1/2 h-3.5 w-3.5 -translate-y-1/2 -translate-x-1/2 rounded-full border-2 border-white shadow-sm", meta.text)}
               style={{ left: `${meta.position}%`, backgroundColor: "currentColor" }}
             />
           </div>
-          <div className="mt-1.5 flex justify-between text-xs text-ink-soft">
+          <div className="mt-1.5 flex justify-between text-xs text-foreground-soft">
             <span>Low</span>
             <span>Caution</span>
             <span>Suspicious</span>

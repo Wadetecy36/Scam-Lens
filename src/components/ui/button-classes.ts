@@ -3,7 +3,7 @@ import { cn } from "@/lib/cn";
 export type ButtonVariant =
   | "primary"
   | "secondary"
-  | "quiet"
+  | "accent"
   | "danger"
   | "light";
 
@@ -11,12 +11,13 @@ export type ButtonSize = "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-pine text-paper hover:bg-pine-dark active:bg-pine-dark disabled:bg-ink-soft/40",
+    "bg-primary text-on-primary hover:opacity-90 active:opacity-90 disabled:bg-muted/40",
   secondary:
-    "bg-transparent text-ink border border-ink/25 hover:border-ink/45 hover:bg-ink/5",
-  quiet: "bg-transparent text-pine hover:bg-pine-soft",
-  danger: "bg-risk-high text-paper hover:brightness-95",
-  light: "bg-paper text-pine border border-paper/40 hover:bg-paper/90",
+    "bg-transparent text-primary border-2 border-primary hover:bg-primary/5",
+  accent:
+    "bg-accent text-on-accent hover:opacity-90 active:opacity-90",
+  danger: "bg-destructive text-on-destructive hover:brightness-95",
+  light: "bg-background text-foreground border border-border hover:bg-background/90",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
@@ -37,7 +38,7 @@ export function buttonClasses({
   className?: string;
 } = {}): string {
   return cn(
-    "tap-target inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors duration-150",
+    "tap-target cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-200",
     "disabled:cursor-not-allowed disabled:opacity-60",
     variantClasses[variant],
     sizeClasses[size],

@@ -13,11 +13,11 @@ interface FieldWrapperProps {
 function FieldWrapper({ label, hint, error, htmlFor, children }: FieldWrapperProps) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-ink">
+      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-foreground">
         {label}
       </label>
       {children}
-      {hint && !error && <p className="mt-1.5 text-sm text-ink-soft">{hint}</p>}
+      {hint && !error && <p className="mt-1.5 text-sm text-foreground-soft">{hint}</p>}
       {error && (
         <p className="mt-1.5 text-sm text-risk-high" role="alert">
           {error}
@@ -42,8 +42,8 @@ export function TextAreaField({ label, hint, error, className, id, ...props }: T
         id={fieldId}
         aria-invalid={!!error}
         className={cn(
-          "w-full rounded-[var(--radius-card)] border border-ink/20 bg-white/70 p-4 text-[1rem] leading-relaxed",
-          "placeholder:text-ink-soft/60 focus:border-pine",
+          "w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 p-4 text-[1rem] leading-relaxed",
+          "placeholder:text-foreground-soft/60 focus:border-primary",
           error && "border-risk-high",
           className,
         )}
@@ -68,8 +68,8 @@ export function InputField({ label, hint, error, className, id, ...props }: Inpu
         id={fieldId}
         aria-invalid={!!error}
         className={cn(
-          "tap-target w-full rounded-[var(--radius-card)] border border-ink/20 bg-white/70 px-4 text-[1rem]",
-          "placeholder:text-ink-soft/60 focus:border-pine",
+          "tap-target w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 px-4 text-[1rem]",
+          "placeholder:text-foreground-soft/60 focus:border-primary",
           error && "border-risk-high",
           className,
         )}

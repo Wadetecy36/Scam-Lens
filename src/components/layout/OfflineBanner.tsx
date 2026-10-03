@@ -18,7 +18,7 @@ export function OfflineBanner() {
   if (!isOffline) return null;
 
   return (
-    <div role="status" className="flex items-center justify-center gap-2 bg-ink py-2 text-sm text-paper">
+    <div role="status" className="flex items-center justify-center gap-2 bg-foreground py-2 text-sm text-background">
       <WifiOff aria-hidden="true" size={15} />
       You're offline. Reconnect to analyze a message.
     </div>

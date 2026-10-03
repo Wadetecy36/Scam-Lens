@@ -22,10 +22,10 @@ export function AboutPage() {
 
   return (
     <main className="container-reading py-10 sm:py-14">
-      <ShieldCheck aria-hidden="true" className="text-pine" size={32} />
-      <h1 className="mt-4 font-display text-4xl text-ink">About ScamLens</h1>
+      <ShieldCheck aria-hidden="true" className="text-primary" size={32} />
+      <h1 className="mt-4 font-heading text-4xl text-foreground">About ScamLens</h1>
       
-      <div className="mt-8 space-y-6 text-ink-soft text-lg">
+      <div className="mt-8 space-y-6 text-foreground-soft text-lg">
         <p>
           ScamLens is a digital safety service. We help you check if a message, link, or picture might be a scam before you reply, click, or pay.
         </p>
@@ -34,12 +34,12 @@ export function AboutPage() {
           It is built to be simple and clear. You do not need to be an expert with computers or mobile phones to use it. When you share something suspicious with us, we look for common tricks that fraudsters use to try and take your money or personal details.
         </p>
         
-        <h2 className="mt-8 font-display text-2xl text-ink">What we can do</h2>
+        <h2 className="mt-8 font-heading text-2xl text-foreground">What we can do</h2>
         <p>
           We can give you a second opinion. If someone sends you an urgent message asking for money, we can tell you if it looks like a known scam. We explain the warning signs in plain English and suggest safe steps you can take.
         </p>
         
-        <h2 className="mt-8 font-display text-2xl text-ink">What we cannot do</h2>
+        <h2 className="mt-8 font-heading text-2xl text-foreground">What we cannot do</h2>
         <p>
           ScamLens is not perfect. Our system might miss a new type of scam, or it might flag a message that is actually safe. 
         </p>

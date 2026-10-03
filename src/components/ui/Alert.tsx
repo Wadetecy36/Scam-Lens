@@ -5,9 +5,9 @@ import { cn } from "@/lib/cn";
 type AlertTone = "info" | "warning" | "offline";
 
 const TONE_META: Record<AlertTone, { icon: typeof Info; classes: string }> = {
-  info: { icon: Info, classes: "bg-pine-soft border-pine/25 text-pine-dark" },
+  info: { icon: Info, classes: "bg-primary-soft border-primary/25 text-primary-dark" },
   warning: { icon: TriangleAlert, classes: "bg-risk-caution-soft border-risk-caution/30 text-risk-caution" },
-  offline: { icon: WifiOff, classes: "bg-ink/5 border-ink/15 text-ink-soft" },
+  offline: { icon: WifiOff, classes: "bg-foreground/5 border-border/15 text-foreground-soft" },
 };
 
 interface AlertProps {

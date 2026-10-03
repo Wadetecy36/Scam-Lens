@@ -13,7 +13,7 @@ export function Checklist({ items, tone, title }: ChecklistProps) {
   const Icon = tone === "do" ? Check : X;
   return (
     <section aria-labelledby={`checklist-${tone}`}>
-      <h3 id={`checklist-${tone}`} className="font-display text-lg">
+      <h3 id={`checklist-${tone}`} className="font-heading text-lg">
         {title}
       </h3>
       <ul className="mt-2 space-y-2">
@@ -38,7 +38,7 @@ export function Checklist({ items, tone, title }: ChecklistProps) {
 export function IconRow({ icon, children }: { icon: ReactNode; children: ReactNode }) {
   return (
     <div className="flex items-start gap-3">
-      <span className="mt-0.5 text-pine">{icon}</span>
+      <span className="mt-0.5 text-primary">{icon}</span>
       <span>{children}</span>
     </div>
   );

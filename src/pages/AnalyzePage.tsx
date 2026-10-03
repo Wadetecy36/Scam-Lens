@@ -15,38 +15,38 @@ export function AnalyzePage() {
 
   return (
     <main className="container-page py-10 sm:py-14">
-      <Link to="/" className="tap-target inline-flex items-center text-sm font-medium text-ink-soft hover:text-pine">← Back</Link>
+      <Link to="/" className="tap-target inline-flex items-center text-sm font-medium text-foreground-soft hover:text-primary">← Back</Link>
       <h1 className="mt-7 max-w-xl text-4xl sm:text-5xl">What did you receive?</h1>
-      <p className="mt-4 max-w-lg text-lg text-ink-soft">Pick the thing you're worried about. We'll help you decide what to do next.</p>
+      <p className="mt-4 max-w-lg text-lg text-foreground-soft">Pick the thing you're worried about. We'll help you decide what to do next.</p>
 
       <div className="mt-8 space-y-3">
         {PRIMARY_OPTIONS.map(({ to, icon: Icon, title, body }) => (
           <Link key={to} to={to} className="group block">
-            <Card className="flex min-h-[104px] items-center gap-4 p-5 transition-colors group-hover:border-pine/30 group-hover:bg-pine-soft/40">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pine-soft text-pine"><Icon aria-hidden="true" size={23} /></span>
+            <Card className="flex min-h-[104px] items-center gap-4 p-5 transition-colors group-hover:border-primary/30 group-hover:bg-primary-soft/40">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary"><Icon aria-hidden="true" size={23} /></span>
               <span className="min-w-0 flex-1">
-                <span className="block font-display text-xl">{title}</span>
-                <span className="mt-1 block text-sm text-ink-soft">{body}</span>
+                <span className="block font-heading text-xl">{title}</span>
+                <span className="mt-1 block text-sm text-foreground-soft">{body}</span>
               </span>
-              <ArrowRight aria-hidden="true" className="shrink-0 text-ink-soft" />
+              <ArrowRight aria-hidden="true" className="shrink-0 text-foreground-soft" />
             </Card>
           </Link>
         ))}
       </div>
 
-      <div className="mt-7 border-t border-ink/10 pt-6">
-        <Link to="/analyze/call" className="tap-target inline-flex items-center gap-2 text-sm font-medium text-pine hover:text-pine-dark">
+      <div className="mt-7 border-t border-border/10 pt-6">
+        <Link to="/analyze/call" className="tap-target inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary-dark">
           <Phone aria-hidden="true" size={18} />
           Something someone told me
         </Link>
-        <p className="mt-1 text-sm text-ink-soft">Describe a call or conversation that felt wrong.</p>
+        <p className="mt-1 text-sm text-foreground-soft">Describe a call or conversation that felt wrong.</p>
       </div>
 
-      <div className="mt-8 rounded-[var(--radius-card)] bg-pine-soft/60 p-4 text-sm text-ink-soft">
-        <strong className="text-ink">Keep private information out.</strong> Never enter a password, PIN, OTP, or recovery code.
+      <div className="mt-8 rounded-[var(--radius-card)] bg-primary-soft/60 p-4 text-sm text-foreground-soft">
+        <strong className="text-foreground">Keep private information out.</strong> Never enter a password, PIN, OTP, or recovery code.
       </div>
 
-      <Link to="/" className={buttonClasses({ variant: "quiet", className: "mt-5" })}>Back home</Link>
+      <Link to="/" className={buttonClasses({ variant: "light", className: "mt-5" })}>Back home</Link>
     </main>
   );
 }

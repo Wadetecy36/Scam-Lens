@@ -1,47 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
-@import "@fontsource/fraunces/400.css";
-@import "@fontsource/fraunces/500.css";
-@import "@fontsource/fraunces/600.css";
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
 
 @theme {
-  --color-paper: #f7f5ef;
-  --color-paper-dim: #eeebe2;
-  --color-white: #ffffff;
+  --color-primary: #DC2626;
+  --color-on-primary: #FFFFFF;
+  --color-secondary: #EF4444;
+  --color-on-secondary: #000000;
+  --color-accent: #2563EB;
+  --color-on-accent: #FFFFFF;
+  --color-background: #FFF1F2;
+  --color-foreground: #0F172A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0F172A;
+  --color-muted: #FCF1F1;
+  --color-muted-foreground: #475569;
+  --color-border: #FAE4E4;
+  --color-destructive: #DC2626;
+  --color-on-destructive: #FFFFFF;
+  --color-ring: #DC2626;
 
-  --color-ink: #182421;
-  --color-ink-soft: #53615c;
-  --color-ink-muted: #77827d;
+  --font-display: "Lora", ui-serif, Georgia, serif;
+  --font-sans: "Raleway", ui-sans-serif, system-ui, sans-serif;
 
-  --color-pine: #286052;
-  --color-pine-dark: #1d473d;
-  --color-pine-soft: #e1eee9;
-  --color-pine-pale: #f0f6f3;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
 
-  --color-clay: #c56536;
-  --color-clay-soft: #f6e4d9;
-
-  --color-sun: #d7a13a;
-  --color-sun-soft: #f7edd7;
-
-  --color-risk-low: #3d7c59;
-  --color-risk-low-soft: #e2f0e7;
-  --color-risk-caution: #ad7b27;
-  --color-risk-caution-soft: #f7ecd4;
-  --color-risk-suspicious: #c56536;
-  --color-risk-suspicious-soft: #f6e3d9;
-  --color-risk-high: #a73c2d;
-  --color-risk-high-soft: #f5deda;
-
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-
-  --radius-card: 1.25rem;
-  --radius-lg: 1.5rem;
+  --radius-card: 12px;
+  --radius-lg: 16px;
   --radius-pill: 999px;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
 }
 
 @layer base {
@@ -53,8 +49,8 @@
 
   body {
     margin: 0;
-    background: var(--color-paper);
-    color: var(--color-ink);
+    background: var(--color-background);
+    color: var(--color-foreground);
     font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.55;
@@ -66,7 +62,7 @@
   h3 {
     margin: 0;
     font-family: var(--font-display);
-    color: var(--color-ink);
+    color: var(--color-foreground);
     line-height: 1.08;
     letter-spacing: -0.025em;
   }
@@ -78,12 +74,12 @@
   }
 
   ::selection {
-    background: var(--color-pine-soft);
-    color: var(--color-pine-dark);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-pine);
+    outline: 3px solid var(--color-primary);
     outline-offset: 3px;
     border-radius: 8px;
   }
@@ -116,7 +112,7 @@
   }
 
   .hairline {
-    border-top: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+    border-top: 1px solid var(--color-border);
   }
 
   .tap-target {
@@ -146,7 +142,5 @@
 }
 
 .soft-shadow {
-  box-shadow:
-    0 1px 2px rgba(24, 36, 33, 0.04),
-    0 12px 40px rgba(24, 36, 33, 0.06);
+  box-shadow: var(--shadow-md);
 }

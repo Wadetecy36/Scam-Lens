@@ -45,22 +45,22 @@ export function AnalysisInputPage({ type, title, description, children, getInput
 
   return (
     <main className="container-page py-10 sm:py-14">
-      <Link to="/analyze" className="tap-target inline-flex items-center gap-2 text-sm font-medium text-ink-soft hover:text-pine">
+      <Link to="/analyze" className="tap-target inline-flex items-center gap-2 text-sm font-medium text-foreground-soft hover:text-primary">
         <ArrowLeft aria-hidden="true" size={17} /> Choose another way
       </Link>
       <div className="mt-8 flex items-start gap-3">
-        <ShieldCheck aria-hidden="true" className="mt-1 shrink-0 text-pine" size={25} />
+        <ShieldCheck aria-hidden="true" className="mt-1 shrink-0 text-primary" size={25} />
         <div>
-          <h1 className="mt-1 font-display text-4xl">{title}</h1>
+          <h1 className="mt-1 font-heading text-4xl">{title}</h1>
         </div>
       </div>
-      <p className="mt-4 max-w-xl text-lg text-ink-soft">{description}</p>
+      <p className="mt-4 max-w-xl text-lg text-foreground-soft">{description}</p>
       <div className="mt-8">{children}</div>
       {error && <div className="mt-5"><Alert tone="warning" title="The check didn't go through." action={<Button variant="secondary" onClick={submit}>Try again</Button>}>{error}</Alert></div>}
       <Button className="mt-6 w-full sm:w-auto" size="lg" onClick={submit} disabled={disabled || loading} icon={loading ? <LoaderCircle aria-hidden="true" size={18} className="animate-spin" /> : undefined}>
         {loading ? "Checking…" : "Check with ScamLens"}
       </Button>
-      <p className="mt-4 text-sm text-ink-soft">ScamLens gives a second opinion. It cannot guarantee that something is safe.</p>
+      <p className="mt-4 text-sm text-foreground-soft">ScamLens gives a second opinion. It cannot guarantee that something is safe.</p>
     </main>
   );
 }

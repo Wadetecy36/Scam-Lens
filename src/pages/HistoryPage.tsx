@@ -30,15 +30,15 @@ export function HistoryPage() {
     <main className="container-page py-10 sm:py-14">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="mt-1 font-display text-4xl">History</h1>
+          <h1 className="mt-1 font-heading text-4xl">History</h1>
         </div>
         {entries.length > 0 && (
-          <Button variant="quiet" onClick={clear}>
+          <Button variant="light" onClick={clear}>
             Clear all
           </Button>
         )}
       </div>
-      <p className="mt-4 text-ink-soft">
+      <p className="mt-4 text-foreground-soft">
         Only lightweight result details are saved here. Your original message or
         screenshot isn't stored in history.
       </p>
@@ -59,7 +59,7 @@ export function HistoryPage() {
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center gap-3 rounded-[var(--radius-card)] border border-ink/10 bg-white/50 p-4"
+              className="flex items-center gap-3 rounded-[var(--radius-card)] border border-border/10 bg-white/50 p-4"
             >
               <Link to={`/result/${entry.id}`} className="min-w-0 flex-1">
                 <RiskPill level={entry.riskLevel} score={entry.riskScore} />
@@ -67,13 +67,13 @@ export function HistoryPage() {
                   {TYPE_LABELS[entry.inputType]} ·{" "}
                   {entry.category.replaceAll("_", " ")}
                 </p>
-                <p className="mt-1 text-xs text-ink-soft">
+                <p className="mt-1 text-xs text-foreground-soft">
                   {new Date(entry.createdAt).toLocaleString()}
                 </p>
               </Link>
               <button
                 type="button"
-                className="tap-target rounded-full p-2 text-ink-soft hover:bg-ink/5"
+                className="tap-target rounded-full p-2 text-foreground-soft hover:bg-foreground/5"
                 onClick={() => remove(entry.id)}
                 aria-label="Delete saved check"
               >
