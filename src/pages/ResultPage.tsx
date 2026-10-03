@@ -3,7 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, Users, Bookmark, BookmarkCheck, ChevronDown, ShieldCheck } from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
-import { Button, buttonClasses } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { Alert } from "@/components/ui/Alert";
 import { ReadAloudButton } from "@/components/voice/ReadAloudButton";
 import { getResult } from "@/lib/result-store";
@@ -18,7 +19,7 @@ export function ResultPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saved, setSaved] = useState(() => !!id && listHistory().some((entry) => entry.id === id));
   if (!result) {
-    return <main className="container-page py-14"><Alert tone="warning" title="This result is no longer available.">Results are kept in this session only. If you refreshed the page, check it again to create a new result.</Alert><Link to="/analyze" className="mt-5 inline-flex"><Button>Check something</Button></Link></main>;
+    return <main className="container-page py-14"><Alert tone="warning" title="This result is no longer available.">Results are kept in this session only. If you refreshed the page, check it again to create a new result.</Alert><Link to="/analyze" className={buttonClasses({ className: "mt-5 inline-flex" })}>Check something</Link></main>;
   }
 
   const { analysis } = result;

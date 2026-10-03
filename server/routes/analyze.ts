@@ -1,6 +1,6 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { sendError, sendJson } from "../http.js";
-import { parseAnalyzeRequest } from "../validation/analyze.js";
+import { parseAnalyzeRequest, ValidationError } from "../validation/analyze.js";
 import { getAIProvider } from "../providers/index.js";
 import { analyzeCombinedRisk } from "../risk/engine.js";
 import type { ScamAnalysisInput } from "../../src/ai/scam-analysis/schema.js";
@@ -105,6 +105,11 @@ export async function handleAnalyze(
       analysis,
     });
   } catch (error) {
+    if (error instanceof ValidationError) {
+      sendError(res, 400, "BAD_REQUEST", error.message);
+      return;
+    }
+
     const message =
       error instanceof Error
         ? error.message

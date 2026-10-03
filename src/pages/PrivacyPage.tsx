@@ -1,2 +1,42 @@
 import { useDocumentHead } from "@/hooks/useDocumentHead";
-export function PrivacyPage() { useDocumentHead({ title: "Privacy", description: "How ScamLens handles analysis data and saved history in the Phase 1 foundation.", path: "/privacy" }); return <main className="container-page py-10 sm:py-14"><h1 className="font-display text-4xl">Privacy</h1><div className="mt-6 space-y-6 text-ink-soft"><section><h2 className="font-display text-2xl text-ink">What we try not to keep</h2><p className="mt-2">Saved history stores lightweight metadata such as risk level, category, input type, and dates. Raw message or screenshot content is not written to that history store.</p></section><section><h2 className="font-display text-2xl text-ink">Session results</h2><p className="mt-2">The current Phase 1 result store keeps analysis data in memory so the result screen can work. A page refresh clears it.</p></section><section><h2 className="font-display text-2xl text-ink">Sensitive credentials</h2><p className="mt-2">ScamLens should never ask for passwords, PINs, OTPs, recovery codes, or other authentication secrets. Don't paste them into an analysis.</p></section><section><h2 className="font-display text-2xl text-ink">Phase 1 limitation</h2><p className="mt-2">This is a foundation build. Production server-side privacy controls, retention enforcement beyond local history, authentication, and real AI provider infrastructure belong to later phases.</p></section></div></main>; }
+
+export function PrivacyPage() {
+  useDocumentHead({
+    title: "Privacy policy",
+    description: "How ScamLens handles your information and keeps you safe.",
+    path: "/privacy",
+  });
+
+  return (
+    <main className="container-reading py-10 sm:py-14">
+      <h1 className="font-display text-4xl text-ink">Privacy policy</h1>
+      
+      <div className="mt-8 space-y-8 text-ink-soft text-lg">
+        <p>
+          This page explains how we handle your information when you use ScamLens. We believe in collecting as little personal data as possible.
+        </p>
+
+        <section>
+          <h2 className="font-display text-2xl text-ink">What happens to the items you check</h2>
+          <p className="mt-2">
+            When you check a message, link, or picture, we process it to give you safety advice. Once the analysis is complete and you leave the page or close your browser, the actual content of your message or picture is cleared from our active system.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl text-ink">Your history</h2>
+          <p className="mt-2">
+            If you check your past results in the "History" section, you will see a summary. We only save the risk level, the type of scam, and the date. We do not save the private text or pictures you uploaded in this history list.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="font-display text-2xl text-ink">Keeping yourself safe</h2>
+          <p className="mt-2">
+            Please help us protect your privacy. You should never type or upload your passwords, PIN codes, or bank card details into ScamLens. We will never ask you for them.
+          </p>
+        </section>
+      </div>
+    </main>
+  );
+}

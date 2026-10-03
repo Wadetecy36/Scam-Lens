@@ -12,11 +12,14 @@ const LINK_GROUPS: { title: string; links: { to: string; label: string }[] }[] =
     ],
   },
   {
-    title: "Company",
+    title: "Information",
     links: [
+      { to: "/how-it-works", label: "How it works" },
+      { to: "/learn", label: "Common scams" },
       { to: "/about", label: "About ScamLens" },
       { to: "/privacy", label: "Privacy" },
       { to: "/terms", label: "Terms" },
+      { to: "/contact", label: "Contact" },
     ],
   },
 ];

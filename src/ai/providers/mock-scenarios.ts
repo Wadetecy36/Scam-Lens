@@ -280,12 +280,12 @@ export type MockScenarioKey = keyof typeof MOCK_SCENARIOS;
 /** Very lightweight heuristic used only to pick a believable mock scenario from free text. */
 export function pickScenarioForText(text: string): MockScenarioKey {
   const t = text.toLowerCase();
-  if (/(won|winner|prize|congratulations|lottery)/.test(t)) return "fake_prize";
-  if (/(bank|account.*(block|suspend|verify)|otp)/.test(t)) return "fake_bank";
-  if (/(delivery|courier|package|customs|redeliver)/.test(t)) return "fake_delivery";
-  if (/(job|hiring|work from home|salary|recruit)/.test(t)) return "fake_job_offer";
-  if (/(invest|crypto|returns|profit|trading)/.test(t)) return "investment_scam";
-  if (/(emergency|arrested|hospital|accident|bail)/.test(t)) return "fake_emergency";
-  if (/(verify your account|confirm your account|click to verify)/.test(t)) return "suspicious_verification";
+  if (/(you('ve| have)? won|winner|claim.*(prize|lottery)|lottery.*(win|winnings|claim)|congratulations.*(won|prize))/i.test(t)) return "fake_prize";
+  if (/(bank.*(suspend|close|block|verify|alert|security|problem|agent)|(suspend|closed|blocked|verify).*account|otp|security code)/i.test(t)) return "fake_bank";
+  if (/(delivery|package|customs).*(fee|pay|link|reschedule|failed|waiting)/i.test(t)) return "fake_delivery";
+  if (/(job offer|hiring.*(urgent|fee)|work from home.*(\$|\bpay\b)|daily salary|protocol fee|enlistment)/i.test(t)) return "fake_job_offer";
+  if (/(invest.*(guarantee|guaranteed|24 hours|risk[- ]free|double)|crypto.*(profit|double|earn)|guaranteed (profit|return|income)|double your money)/i.test(t)) return "investment_scam";
+  if (/(emergency|arrested|hospital|accident|police.*payment|bail)/i.test(t)) return "fake_emergency";
+  if (/(verify your account|confirm your account|click to verify|account.*suspended.*verification)/i.test(t)) return "suspicious_verification";
   return "legitimate_low_risk";
 }

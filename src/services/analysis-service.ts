@@ -1,21 +1,79 @@
 import { MockAIProvider } from "@/ai/providers/mock-provider";
 import type { AIProvider } from "@/ai/scam-analysis/analyzer";
+import { AnalysisRequestError } from "@/ai/scam-analysis/analyzer";
 import type { ScamAnalysis, ScamAnalysisInput } from "@/ai/scam-analysis/schema";
+import { parseScamAnalysis } from "@/ai/scam-analysis/validators";
+import { env } from "@/config/env";
 
-/**
- * Central place the UI calls into for analysis. Hides which AIProvider is
- * active behind one function, so swapping the mock provider for a real
- * server-backed one later is a one-line change here — not a UI change.
- *
- * In Phase 2, this should call a server endpoint (never an AI provider
- * directly from the client) so API keys stay server-side.
- */
-let activeProvider: AIProvider = new MockAIProvider();
+export class ServerBackedAIProvider implements AIProvider {
+  readonly name = "server";
+  private readonly baseUrl: string;
+  private readonly fallbackProvider: AIProvider;
+
+  constructor(
+    baseUrl: string = env.apiUrl,
+    fallbackProvider: AIProvider = new MockAIProvider(),
+  ) {
+    this.baseUrl = baseUrl;
+    this.fallbackProvider = fallbackProvider;
+  }
+
+  async analyzeScam(input: ScamAnalysisInput): Promise<ScamAnalysis> {
+    const content =
+      input.type === "url" ? input.url ?? "" : input.text ?? "";
+    const type = input.type === "image" ? "screenshot" : input.type;
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+      const response = await fetch(`${this.baseUrl}/api/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type, content }),
+        signal: controller.signal,
+      }).finally(() => clearTimeout(timeoutId));
+
+      if (!response.ok) {
+        throw new Error(`Server returned status ${response.status}`);
+      }
+
+      const json = (await response.json()) as {
+        ok?: boolean;
+        analysis?: unknown;
+      };
+
+      if (!json?.ok || !json?.analysis) {
+        throw new Error("Invalid response structure from ScamLens server.");
+      }
+
+      return parseScamAnalysis(json.analysis);
+    } catch (err) {
+      if (env.useMockAnalysis || env.appEnv === "development") {
+        console.warn(
+          "ScamLens API unavailable, falling back to local simulation provider:",
+          err,
+        );
+        return this.fallbackProvider.analyzeScam(input);
+      }
+      throw new AnalysisRequestError(
+        "ScamLens analysis service is currently unavailable. Please try again shortly.",
+        err,
+      );
+    }
+  }
+}
+
+let activeProvider: AIProvider = env.useMockAnalysis
+  ? new MockAIProvider()
+  : new ServerBackedAIProvider();
 
 export function setAnalysisProvider(provider: AIProvider): void {
   activeProvider = provider;
 }
 
-export async function runScamAnalysis(input: ScamAnalysisInput): Promise<ScamAnalysis> {
+export async function runScamAnalysis(
+  input: ScamAnalysisInput,
+): Promise<ScamAnalysis> {
   return activeProvider.analyzeScam(input);
 }

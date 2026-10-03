@@ -29,8 +29,10 @@ export function AnalysisInputPage({ type, title, description, children, getInput
     setLoading(true);
     track("analysis_started", { inputType: type });
     try {
-      const analysis = await runScamAnalysis(getInput());
-      storeResult(analysis, getInput().text);
+      const input = getInput();
+      const analysis = await runScamAnalysis(input);
+      const rawInput = input.type === "url" ? input.url : input.text;
+      storeResult(analysis, rawInput);
       track("analysis_completed", { inputType: type, riskLevel: analysis.riskLevel });
       navigate(`/result/${analysis.id}`);
     } catch {

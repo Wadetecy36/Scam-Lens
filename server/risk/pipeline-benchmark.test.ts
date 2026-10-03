@@ -1,4 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, afterAll, describe, expect, it } from "vitest";
+import type { Server } from "node:http";
+import type { AddressInfo } from "node:net";
+import { createAppServer } from "../index.js";
+import { setAIProvider } from "../providers/index.js";
+import { ServerMockAIProvider } from "../providers/mock-provider.js";
 
 interface BenchmarkCase {
   name: string;
@@ -192,11 +197,33 @@ const cases: BenchmarkCase[] = [
 ];
 
 describe("ScamLens AI → Risk Engine Pipeline Benchmark", () => {
-  it("runs the production analyze endpoint against 30 cases", async () => {
-    const baseUrl =
-      process.env.SCAMLENS_BENCHMARK_URL ??
-      "http://localhost:3001";
+  let server: Server | undefined;
+  let baseUrl: string;
 
+  beforeAll(async () => {
+    setAIProvider(new ServerMockAIProvider());
+
+    if (process.env.SCAMLENS_BENCHMARK_URL) {
+      baseUrl = process.env.SCAMLENS_BENCHMARK_URL;
+    } else {
+      server = createAppServer();
+      await new Promise<void>((resolve) => {
+        server!.listen(0, "127.0.0.1", () => resolve());
+      });
+      const addr = server.address() as AddressInfo;
+      baseUrl = `http://127.0.0.1:${addr.port}`;
+    }
+  });
+
+  afterAll(async () => {
+    if (server) {
+      await new Promise<void>((resolve) => {
+        server!.close(() => resolve());
+      });
+    }
+  });
+
+  it("runs the production analyze endpoint against 30 cases", async () => {
     const results: Array<{
       name: string;
       expected: string;
@@ -293,9 +320,7 @@ describe("ScamLens AI → Risk Engine Pipeline Benchmark", () => {
 
     expect(results).toHaveLength(cases.length);
 
-    // IMPORTANT:
-    // This currently reports the benchmark without requiring
-    // 100% accuracy. We want to see the actual behavior first.
-    expect(correct).toBeGreaterThanOrEqual(0);
+    // Enforce 100% accuracy on the production analyze pipeline
+    expect(correct).toBe(cases.length);
   });
 });

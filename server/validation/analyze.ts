@@ -12,13 +12,20 @@ export interface AnalyzeRequest {
   content: string;
 }
 
+export class ValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 const MAX_CONTENT_LENGTH = 20_000;
 
 export function parseAnalyzeRequest(
   body: unknown,
 ): AnalyzeRequest {
   if (!body || typeof body !== "object") {
-    throw new Error("Request body must be a JSON object.");
+    throw new ValidationError("Request body must be a JSON object.");
   }
 
   const input = body as Record<string, unknown>;
@@ -27,7 +34,7 @@ export function parseAnalyzeRequest(
     typeof input.type !== "string" ||
     !INPUT_TYPES.includes(input.type as AnalyzeInputType)
   ) {
-    throw new Error(
+    throw new ValidationError(
       "type must be one of: message, screenshot, url, call.",
     );
   }
@@ -36,11 +43,11 @@ export function parseAnalyzeRequest(
     typeof input.content !== "string" ||
     input.content.trim().length === 0
   ) {
-    throw new Error("content must be a non-empty string.");
+    throw new ValidationError("content must be a non-empty string.");
   }
 
   if (input.content.length > MAX_CONTENT_LENGTH) {
-    throw new Error(
+    throw new ValidationError(
       `content must not exceed ${MAX_CONTENT_LENGTH} characters.`,
     );
   }

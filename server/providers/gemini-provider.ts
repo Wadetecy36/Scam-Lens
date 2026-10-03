@@ -119,18 +119,22 @@ function withTimeout<T>(
   promise: Promise<T>,
   timeoutMs: number,
 ): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => {
-      setTimeout(() => {
-        reject(
-          new AnalysisRequestError(
-            "Gemini analysis timed out.",
-          ),
-        );
-      }, timeoutMs);
-    }),
-  ]);
+  let timer: NodeJS.Timeout | undefined;
+  const timeoutPromise = new Promise<T>((_, reject) => {
+    timer = setTimeout(() => {
+      reject(
+        new AnalysisRequestError(
+          "Gemini analysis timed out.",
+        ),
+      );
+    }, timeoutMs);
+  });
+
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  });
 }
 
 export class GeminiAIProvider implements ServerAIProvider {
@@ -176,11 +180,6 @@ export class GeminiAIProvider implements ServerAIProvider {
       try {
         parsed = JSON.parse(text);
       } catch (error) {
-        console.error(
-          "Gemini raw response:",
-          text,
-        );
-
         throw new AnalysisRequestError(
           "Gemini returned invalid JSON.",
           error,
@@ -198,52 +197,6 @@ export class GeminiAIProvider implements ServerAIProvider {
       }
 
       const result = parsed as Record<string, unknown>;
-
-      console.log(
-        "Gemini raw schemaVersion:",
-        result.schemaVersion,
-        "type:",
-        typeof result.schemaVersion,
-      );
-
-      console.log(
-        "Gemini category:",
-        result.category,
-      );
-
-      console.log(
-        "Gemini inputType:",
-        result.inputType,
-      );
-
-      console.log(
-        "Gemini riskScore:",
-        result.riskScore,
-      );
-
-      console.log(
-        "Gemini riskLevel:",
-        result.riskLevel,
-      );
-
-      if (Array.isArray(result.warningSigns)) {
-        console.log(
-          "Gemini warningSigns count:",
-          result.warningSigns.length,
-        );
-
-        console.log(
-          "Gemini warningSigns:",
-          JSON.stringify(result.warningSigns, null, 2),
-        );
-      }
-
-      console.log(
-        "Gemini raw confidence:",
-        result.confidence,
-        "type:",
-        typeof result.confidence,
-      );
 
       // ScamLens owns these fields.
       result.schemaVersion = 1;

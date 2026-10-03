@@ -1,6 +1,6 @@
 import { Camera, Link2, MessageSquare, Phone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { buttonClasses } from "@/components/ui/Button";
+import { buttonClasses } from "@/components/ui/button-classes";
 import { Card } from "@/components/ui/Card";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 

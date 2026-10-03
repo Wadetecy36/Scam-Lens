@@ -35,6 +35,7 @@ const RULES: SignalRule[] = [
     patterns: [
       /\b(password|passcode|pin|otp|verification code|security code)\b/i,
       /\b(send|provide|share|enter|give|submit)\b.*\b(password|passcode|pin|otp|verification code|security code)\b/i,
+      /\b(momo pin|mobile money pin|wallet pin)\b/i,
     ],
   },
 
@@ -44,6 +45,7 @@ const RULES: SignalRule[] = [
     patterns: [
       /\b(send money|make a payment|pay now|transfer money|wire transfer|gift card|buy a gift card)\b/i,
       /\b(pay|payment|fee|processing fee|claim fee|activation fee|delivery fee)\b/i,
+      /\b(send it back|reverse (the )?(money|transaction)|cash out|protocol fee|enlistment fee|recruitment fee)\b/i,
     ],
   },
 
@@ -67,6 +69,7 @@ const RULES: SignalRule[] = [
       /\b(microsoft support|microsoft support agent|apple support|google support|amazon support|paypal support)\b/i,
       /\b(customer support|support agent|security team|account security team)\b/i,
       /\b(official notice|official warning|account security alert)\b/i,
+      /\b(mtn (support|customer care|agent|representative|momo)|telecel (support|care|agent)|vodafone (support|agent)|airteltigo|ghana revenue authority|gra|ghana police|customs division|ceps|ghana immigration)\b/i,
     ],
   },
 
@@ -160,10 +163,55 @@ function applyCombinationRules(
   if (
     has("prize_or_reward", "payment_request", "urgency") ||
     (
-      /(lottery|winnings|prize|reward|winner)/i.test(content) &&
-      /(claim fee|processing fee|activation fee|fee)/i.test(content) &&
-      /(today|immediately|right now|urgent|act now)/i.test(content)
+      /\b(lottery|winnings|prize|reward|winner)\b/i.test(content) &&
+      /\b(claim fee|processing fee|activation fee|fee)\b/i.test(content) &&
+      /\b(today|immediately|right now|urgent|act now)\b/i.test(content)
     )
+  ) {
+    return {
+      ...score,
+      score: Math.max(score.score, 85),
+      level: "HIGH" as const,
+    };
+  }
+
+  // Fake recruitment / protocol / enlistment / admission fee scam = HIGH.
+  if (
+    /\b(protocol fee|enlistment fee|recruitment fee|admission fee|slot fee)\b/i.test(content) ||
+    (
+      /\b(recruitment|enlistment|admission|protocol)\b/i.test(content) &&
+      /\b(protocol form|enlistment form|secure (your )?slot|guaranteed (admission|slot|entry))\b/i.test(content) &&
+      has("payment_request")
+    )
+  ) {
+    return {
+      ...score,
+      score: Math.max(score.score, 85),
+      level: "HIGH" as const,
+    };
+  }
+
+  // Mobile money fake reversal or cash-out authorization scam = HIGH.
+  if (
+    /\b(momo|mobile money|telecel cash|vodafone cash|wallet)\b/i.test(content) &&
+    (
+      /\b(mistakenly|accidentally|wrongly)\b.*\b(sent|transferred)\b/i.test(content) ||
+      /\b(reverse|reversal|send it back)\b/i.test(content) ||
+      /\b(approve|authorize|enter)\b.*\b(prompt|pin)\b/i.test(content)
+    )
+  ) {
+    return {
+      ...score,
+      score: Math.max(score.score, 85),
+      level: "HIGH" as const,
+    };
+  }
+
+  // Telecom / MoMo impersonation combined with threat, urgency, or credential request = HIGH.
+  if (
+    /\b(mtn|telecel|vodafone|airteltigo)\b/i.test(content) &&
+    /\b(sim|account|line|wallet|momo)\b/i.test(content) &&
+    (has("threat") || has("urgency") || has("credential_request") || /\b(block|blocked|deactivate|upgrade|swap)\b/i.test(content))
   ) {
     return {
       ...score,
@@ -388,5 +436,5 @@ export function analyzeCombinedRisk(
     })),
   );
 
-  return combined;
+  return applyCombinationRules(combined, content);
 }

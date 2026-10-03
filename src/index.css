@@ -141,37 +141,8 @@
   }
 }
 
-@keyframes float-soft {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
 .animate-settle {
   animation: settle-in 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.animate-float-soft {
-  animation: float-soft 4s ease-in-out infinite;
-}
-
-.grid-paper {
-  background-image:
-    linear-gradient(
-      color-mix(in srgb, var(--color-pine) 6%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-pine) 6%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 32px 32px;
 }
 
 .soft-shadow {

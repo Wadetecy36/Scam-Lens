@@ -13,6 +13,9 @@ import { FamilyPage } from "@/pages/FamilyPage";
 import { AboutPage } from "@/pages/AboutPage";
 import { PrivacyPage } from "@/pages/PrivacyPage";
 import { TermsPage } from "@/pages/TermsPage";
+import { HowItWorksPage } from "@/pages/HowItWorksPage";
+import { LearnPage } from "@/pages/LearnPage";
+import { ContactPage } from "@/pages/ContactPage";
 import { NotFoundPage } from "@/pages/NotFoundPage";
 
 const router = createBrowserRouter([
@@ -33,6 +36,9 @@ const router = createBrowserRouter([
       { path: "about", element: <AboutPage /> },
       { path: "privacy", element: <PrivacyPage /> },
       { path: "terms", element: <TermsPage /> },
+      { path: "how-it-works", element: <HowItWorksPage /> },
+      { path: "learn", element: <LearnPage /> },
+      { path: "contact", element: <ContactPage /> },
       { path: "404", element: <NotFoundPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],

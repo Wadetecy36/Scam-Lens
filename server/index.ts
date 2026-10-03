@@ -1,44 +1,56 @@
-import { createServer } from "node:http";
+import { createServer, type Server } from "node:http";
 import { env } from "./env.js";
-import { sendError, sendJson } from "./http.js";
+import { handleCorsPreflight, sendError, sendJson, setCorsHeaders } from "./http.js";
 import { handleAnalyze } from "./routes/analyze.js";
 
-const server = createServer(async (req, res) => {
-  try {
-    if (req.method === "GET" && req.url === "/api/health") {
-      sendJson(res, 200, {
-        ok: true,
-        service: "scamlens-api",
-        phase: "2A",
-      });
-      return;
+export function createAppServer(): Server {
+  return createServer(async (req, res) => {
+    try {
+      setCorsHeaders(req, res);
+
+      if (handleCorsPreflight(req, res)) {
+        return;
+      }
+
+      if (req.method === "GET" && req.url === "/api/health") {
+        sendJson(res, 200, {
+          ok: true,
+          service: "scamlens-api",
+          phase: "2A",
+        });
+        return;
+      }
+
+      if (req.method === "POST" && req.url === "/api/analyze") {
+        await handleAnalyze(req, res);
+        return;
+      }
+
+      sendError(
+        res,
+        404,
+        "NOT_FOUND",
+        "The requested endpoint was not found.",
+      );
+    } catch (error) {
+      console.error("Unhandled server error:", error);
+
+      sendError(
+        res,
+        500,
+        "INTERNAL_ERROR",
+        "An unexpected server error occurred.",
+      );
     }
+  });
+}
 
-    if (req.method === "POST" && req.url === "/api/analyze") {
-      await handleAnalyze(req, res);
-      return;
-    }
+export const server = createAppServer();
 
-    sendError(
-      res,
-      404,
-      "NOT_FOUND",
-      "The requested endpoint was not found.",
+if (process.env.NODE_ENV !== "test" && !process.env.VITEST) {
+  server.listen(env.port, () => {
+    console.log(
+      `ScamLens API running on http://localhost:${env.port}`,
     );
-  } catch (error) {
-    console.error("Unhandled server error:", error);
-
-    sendError(
-      res,
-      500,
-      "INTERNAL_ERROR",
-      "An unexpected server error occurred.",
-    );
-  }
-});
-
-server.listen(env.port, () => {
-  console.log(
-    `ScamLens API running on http://localhost:${env.port}`,
-  );
-});
+  });
+}
