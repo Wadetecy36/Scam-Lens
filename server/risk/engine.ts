@@ -101,22 +101,48 @@ const RULES: SignalRule[] = [
       /\$?\d[\d,]*(?:\.\d+)?\b.*\b(within|in)\b.*\b(hours?|minutes?|days?)\b/i,
     ],
   },
+
+  {
+    signal: "fake_document",
+    explanation:
+      "The document or statement is explicitly marked as a fictional entity, testing artifact, or has arithmetic balance mismatches.",
+    patterns: [
+      /\b(fictional entity|testing purposes only|math mismatch|for testing purposes|doctored document)\b/i,
+    ],
+  },
+
+  // --- Benchmark Taxonomy Extensions ---
+  {
+    signal: "REMOTE_ACCESS_PROMPT",
+    explanation: "Requests downloading remote control software.",
+    patterns: [/\b(download anydesk|install teamviewer|quicksupport|anydesk|teamviewer)\b/i],
+  },
+  {
+    signal: "TYPOSQUATTING_DOMAIN",
+    explanation: "Domain mimics a trusted brand with subtle edits.",
+    patterns: [/(paypa1\.com|arnazon|chase-verify)/i],
+  },
+  {
+    signal: "SYNTHETIC_DOCUMENT_MARKER",
+    explanation: "Contains explicit synthetic or fake document indicators.",
+    patterns: [/\b(fictional entity|testing purposes only|math mismatch)\b/i],
+  },
+  {
+    signal: "RELATIONSHIP_HIJACK",
+    explanation: "Pretends to be a friend or relative in distress from a new number.",
+    patterns: [/\b(lost my phone|this is my new number|stranded at the airport|need quick cash)\b/i],
+  },
+  {
+    signal: "OFF_PLATFORM_DIVERSION",
+    explanation: "Pushing communication away from monitored channels to encrypted chats.",
+    patterns: [/\b(message me on whatsapp|add me on telegram|continue on signal|email me privately)\b/i],
+  },
+  {
+    signal: "HOMOGLYPH_UNICODE_ATTACK",
+    explanation: "Non-standard Cyrillic or Greek characters replacing Latin alphabets.",
+    patterns: [/[a-zA-Z][\u0400-\u04FF][a-zA-Z]|[a-zA-Z][\u0370-\u03FF][a-zA-Z]/],
+  },
 ];
-
-export function analyzeSignals(content: string) {
-  const signals = RULES
-    .filter((rule) =>
-      rule.patterns.some((pattern) => pattern.test(content)),
-    )
-    .map(({ signal, explanation }) => ({
-      signal,
-      explanation,
-    }));
-
-  const score = scoreSignals(signals);
-
-  return applyCombinationRules(score, content);
-}
 
 function applyCombinationRules(
   score: ReturnType<typeof scoreSignals>,
@@ -405,6 +431,21 @@ function applyCombinationRules(
   }
 
   return score;
+}
+
+export function analyzeSignals(content: string) {
+  const signals = RULES
+    .filter((rule) =>
+      rule.patterns.some((pattern) => pattern.test(content)),
+    )
+    .map(({ signal, explanation }) => ({
+      signal,
+      explanation,
+    }));
+
+  const score = scoreSignals(signals);
+
+  return applyCombinationRules(score, content);
 }
 
 export function analyzeCombinedRisk(

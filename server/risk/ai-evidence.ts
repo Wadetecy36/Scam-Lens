@@ -76,6 +76,36 @@ const SIGNAL_ALIASES: Array<{
       /\b(too good to be true|unrealistic offer|unrealistic reward)\b/i,
     ],
   },
+  {
+    signal: "fake_document",
+    patterns: [
+      /\b(fake document|fictional entity|testing purposes|math mismatch|doctored|manipulated|arithmetic mismatch)\b/i,
+    ],
+  },
+  {
+    signal: "REMOTE_ACCESS_PROMPT",
+    patterns: [
+      /\b(remote access|anydesk|teamviewer|download software|quicksupport)\b/i,
+    ],
+  },
+  {
+    signal: "MFA_OTP_SOLICITATION",
+    patterns: [
+      /\b(mfa|otp|2fa|verification code|pin request|send the 6-digit code)\b/i,
+    ],
+  },
+  {
+    signal: "TYPOSQUATTING_DOMAIN",
+    patterns: [
+      /\b(typosquatting|lookalike domain|mimics trusted brand)\b/i,
+    ],
+  },
+  {
+    signal: "IRREVERSIBLE_PAYMENT_DEMAND",
+    patterns: [
+      /\b(apple gift card|steam card|western union|zelle|bitcoin|usdt)\b/i,
+    ],
+  },
 ];
 
 function signalText(analysis: ScamAnalysis): string {

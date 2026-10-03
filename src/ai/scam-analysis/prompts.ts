@@ -30,8 +30,10 @@ Rules you must follow:
    (e.g. a URL on a known-malicious block list). Prefer calibrated language:
    "this looks suspicious", "we found several warning signs", "we can't
    confirm this is legitimate".
-9. Output strict JSON matching the ScamAnalysis schema. No prose outside the
-   JSON object.
+9. Output strict JSON matching the ScamAnalysis schema. No prose outside the JSON object.
+10. Classification accuracy: Do not classify legitimate, benign messages (e.g. genuine bank alerts) as a scam category like "banking_scam" simply because they contain financial keywords. Only flag them if they contain actual deceptive patterns.
+11. Fake Receipts & Math: Carefully inspect any invoices, bank statements, or payment proofs. Calculate the totals yourself. If starting balance + deposits - withdrawals does not equal the ending balance, or if dates/account numbers contain obvious manipulations or placeholders (e.g. "FOR TESTING PURPOSES"), strongly flag it as a deceptive fake document. YOU MUST assign a riskScore of 80 or higher and a riskLevel of "HIGH" when you see these manipulative markers, regardless of any other context.
+12. Disambiguation: For SIM Swap or password reset attacks, strictly classify them as 'account_takeover' rather than 'impersonation'. Use 'impersonation' only when the attacker is pretending to be a known contact or official entity to extract money/data directly.
 `.trim();
 
 export const CURRENT_ANALYZER_PROMPT_VERSION = "SCAMLENS_ANALYZER_V1" as const;

@@ -39,7 +39,7 @@ export function buttonClasses({
 } = {}): string {
   return cn(
     "tap-target cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-200",
-    "disabled:cursor-not-allowed disabled:opacity-60",
+    "disabled:cursor-not-allowed disabled:opacity-80 disabled:saturate-50 disabled:bg-muted disabled:text-muted-foreground",
     variantClasses[variant],
     sizeClasses[size],
     fullWidth && "w-full",

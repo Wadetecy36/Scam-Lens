@@ -63,12 +63,12 @@ export function ResultPage() {
       </section>
 
       <section className="mt-8 border-t border-border/10 pt-7">
-        <button type="button" onClick={() => setDetailsOpen((open) => !open)} className="tap-target flex w-full items-center justify-between gap-4 text-left">
+        <button type="button" aria-expanded={detailsOpen} aria-controls="details-panel" onClick={() => setDetailsOpen((open) => !open)} className="tap-target flex w-full items-center justify-between gap-4 text-left">
           <span><span className="block font-heading text-xl">Want more detail?</span><span className="text-sm text-foreground-soft">See the fuller explanation and technical information.</span></span>
           <ChevronDown aria-hidden="true" size={22} className={detailsOpen ? "rotate-180 transition-transform" : "transition-transform"} />
         </button>
         {detailsOpen && (
-          <div className="mt-4 rounded-[var(--radius-card)] bg-foreground/5 p-5">
+          <div id="details-panel" className="mt-4 rounded-[var(--radius-card)] bg-foreground/5 p-5">
             <p className="leading-relaxed text-foreground-soft">{analysis.explanations.technical}</p>
             <p className="mt-4 text-sm text-foreground-soft">Risk score: <strong className="text-foreground">{Math.round(analysis.riskScore)}/100</strong> · Confidence: <strong className="text-foreground">{Math.round(analysis.confidence * 100)}%</strong></p>
           </div>

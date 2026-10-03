@@ -35,7 +35,16 @@ export class ServerBackedAIProvider implements AIProvider {
       }).finally(() => clearTimeout(timeoutId));
 
       if (!response.ok) {
-        throw new Error(`Server returned status ${response.status}`);
+        let serverErrorMsg = `Server returned status ${response.status}`;
+        try {
+          const errData = await response.json();
+          if (errData?.error?.message) {
+            serverErrorMsg = errData.error.message;
+          }
+        } catch (_) {
+          // ignore json parse errors
+        }
+        throw new Error(serverErrorMsg);
       }
 
       const json = (await response.json()) as {
@@ -49,7 +58,14 @@ export class ServerBackedAIProvider implements AIProvider {
 
       return parseScamAnalysis(json.analysis);
     } catch (err) {
-      if (env.useMockAnalysis || env.appEnv === "development") {
+      const msg = err instanceof Error ? err.message : String(err);
+      
+      // If the backend specifically rejected the input (e.g., prompt injection, rate limit), surface it immediately
+      if (msg.includes("Input rejected") || msg.includes("Too Many Requests")) {
+        throw new AnalysisRequestError(msg, err);
+      }
+
+      if (env.useMockAnalysis) {
         console.warn(
           "ScamLens API unavailable, falling back to local simulation provider:",
           err,
@@ -57,7 +73,7 @@ export class ServerBackedAIProvider implements AIProvider {
         return this.fallbackProvider.analyzeScam(input);
       }
       throw new AnalysisRequestError(
-        "ScamLens analysis service is currently unavailable. Please try again shortly.",
+        msg || "ScamLens analysis service is currently unavailable. Please try again shortly.",
         err,
       );
     }

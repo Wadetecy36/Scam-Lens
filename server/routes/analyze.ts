@@ -3,6 +3,7 @@ import { sendError, sendJson } from "../http.js";
 import { parseAnalyzeRequest, ValidationError } from "../validation/analyze.js";
 import { getAIProvider } from "../providers/index.js";
 import { analyzeCombinedRisk } from "../risk/engine.js";
+import { redactPII } from "../privacy/pii-redactor.js";
 import type { ScamAnalysisInput } from "../../src/ai/scam-analysis/schema.js";
 
 const MAX_BODY_BYTES = 25_000;
@@ -75,12 +76,43 @@ export async function handleAnalyze(
   try {
     const body = await readBody(req);
     const input = parseAnalyzeRequest(body);
-    const aiInput = toAIInput(input);
+    const content = input.content;
+
+    // PRE-FLIGHT: Prompt Injection & Jailbreak Defense Heuristics
+    // Reject obvious instruction-override attempts before paying for AI tokens.
+    const injectionPatterns = [
+      /ignore.*?instructions/i,
+      /forget.*?instructions/i,
+      /ignore.*?rules/i,
+      /ignore.*?directions/i,
+      /system prompt/i,
+      /bypass rules/i,
+      /you are now a/i,
+      /print.*?instructions/i,
+      /print.*?prompt/i
+    ];
+
+    if (injectionPatterns.some(pattern => pattern.test(content))) {
+      throw new ValidationError("Input rejected: Potential prompt injection or jailbreak attempt detected.");
+    }
 
     const provider = getAIProvider();
-    const aiAnalysis = await provider.analyzeScam(aiInput);
 
-    const content = input.content;
+    // PRIVACY: scrub personal data from the copy that leaves our server.
+    // URLs are the evidence themselves, so they are sent as-is.
+    const redaction =
+      input.type === "url"
+        ? { text: content, counts: {} }
+        : redactPII(content);
+    const aiInput = toAIInput({ ...input, content: redaction.text });
+
+    const redactedTotal = Object.values(redaction.counts).reduce((a, b) => a + (b ?? 0), 0);
+    if (redactedTotal > 0) {
+      // Counts only — never log the values.
+      console.log("[privacy] redacted before AI call:", redaction.counts);
+    }
+
+    const aiAnalysis = await provider.analyzeScam(aiInput);
 
     /*
      * ScamLens owns the final risk decision.
@@ -88,6 +120,7 @@ export async function handleAnalyze(
      * Gemini provides evidence.
      * The deterministic risk engine calculates
      * the final score and risk level.
+     * (It runs locally on the original text, so no evidence is lost.)
      */
     const risk = analyzeCombinedRisk(
       content,
@@ -103,6 +136,7 @@ export async function handleAnalyze(
     sendJson(res, 200, {
       ok: true,
       analysis,
+      privacy: { redactions: redaction.counts },
     });
   } catch (error) {
     if (error instanceof ValidationError) {

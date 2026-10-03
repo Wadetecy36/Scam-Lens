@@ -17,9 +17,9 @@ function FieldWrapper({ label, hint, error, htmlFor, children }: FieldWrapperPro
         {label}
       </label>
       {children}
-      {hint && !error && <p className="mt-1.5 text-sm text-foreground-soft">{hint}</p>}
+      {hint && !error && <p id={`${htmlFor}-hint`} className="mt-1.5 text-sm text-foreground-soft">{hint}</p>}
       {error && (
-        <p className="mt-1.5 text-sm text-risk-high" role="alert">
+        <p id={`${htmlFor}-error`} className="mt-1.5 text-sm text-destructive" role="alert">
           {error}
         </p>
       )}
@@ -36,15 +36,17 @@ interface TextAreaFieldProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
 export function TextAreaField({ label, hint, error, className, id, ...props }: TextAreaFieldProps) {
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const describedBy = error ? `${fieldId}-error` : (hint ? `${fieldId}-hint` : undefined);
   return (
     <FieldWrapper label={label} hint={hint} error={error} htmlFor={fieldId}>
       <textarea
         id={fieldId}
         aria-invalid={!!error}
+        aria-describedby={describedBy}
         className={cn(
           "w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 p-4 text-[1rem] leading-relaxed",
           "placeholder:text-foreground-soft/60 focus:border-primary",
-          error && "border-risk-high",
+          error && "border-destructive",
           className,
         )}
         {...props}
@@ -62,15 +64,17 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 export function InputField({ label, hint, error, className, id, ...props }: InputFieldProps) {
   const autoId = useId();
   const fieldId = id ?? autoId;
+  const describedBy = error ? `${fieldId}-error` : (hint ? `${fieldId}-hint` : undefined);
   return (
     <FieldWrapper label={label} hint={hint} error={error} htmlFor={fieldId}>
       <input
         id={fieldId}
         aria-invalid={!!error}
+        aria-describedby={describedBy}
         className={cn(
           "tap-target w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 px-4 text-[1rem]",
           "placeholder:text-foreground-soft/60 focus:border-primary",
-          error && "border-risk-high",
+          error && "border-destructive",
           className,
         )}
         {...props}

@@ -146,7 +146,7 @@ export function LandingPage() {
                   setMessage(event.target.value.slice(0, 3000))
                 }
                 placeholder="Paste a suspicious message, email, or offer here..."
-                className="mt-4 min-h-48 w-full resize-y rounded-lg border border-border bg-background p-4 text-base text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/20"
+                className="mt-4 min-h-32 w-full resize-y rounded-lg border border-border bg-background p-4 text-base text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/20"
                 aria-describedby="scanner-privacy"
               />
 
@@ -247,6 +247,43 @@ export function LandingPage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* WHO IS IT FOR */}
+      <section className="bg-background py-16 sm:py-24 border-t border-border">
+        <div className="container-page">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+            <div className="order-2 lg:order-1 flex flex-col gap-6">
+              <img src="/images/hero.jpg" alt="Ghanaian mother checking her phone" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[300px]" />
+              <div className="grid grid-cols-2 gap-6">
+                <img src="/images/family.jpg" alt="Younger relative helping an older adult" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[200px]" />
+                <img src="/images/business.jpg" alt="Market trader checking his phone" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[200px]" />
+              </div>
+            </div>
+            <div className="order-1 lg:order-2">
+              <h2 className="font-display text-4xl font-bold text-foreground sm:text-5xl">
+                Built for everyday people.
+              </h2>
+              <p className="mt-6 text-xl text-muted-foreground leading-relaxed">
+                Whether you're a parent receiving a strange WhatsApp message, a market trader getting an unexpected payment link, or someone helping their family stay safe online—ScamLens is built to give you calm, clear advice when you need it most.
+              </p>
+              <ul className="mt-8 space-y-4 text-lg text-foreground font-medium">
+                <li className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
+                  No technical skills required
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
+                  Plain English explanations
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
+                  Fast on mobile networks
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>

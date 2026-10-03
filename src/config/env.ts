@@ -12,5 +12,5 @@ export const env = {
   apiUrl: import.meta.env.VITE_API_URL ?? "http://localhost:3001",
   analyticsEnabled: import.meta.env.VITE_ANALYTICS_ENABLED === "true",
   /** Feature flag: real AI provider vs mock. Server decides the real switch; this only affects local dev UX. */
-  useMockAnalysis: import.meta.env.VITE_USE_MOCK_ANALYSIS !== "false",
+  useMockAnalysis: false,
 } as const;
