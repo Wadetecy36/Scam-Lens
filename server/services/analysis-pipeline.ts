@@ -1,25 +1,13 @@
 import { getAIProvider } from "../providers/index.js";
 import { analyzeCombinedRisk } from "../risk/engine.js";
+import { analyzeOfflineScam } from "../../src/risk/offline-analyzer.js";
 import { redactPII } from "../privacy/pii-redactor.js";
 import { aggregateThreatIntel } from "../threat-intel/aggregator.js";
-import { ValidationError } from "../validation/analyze.js";
 import type {
   ScamAnalysis,
   ScamAnalysisInput,
 } from "../../src/ai/scam-analysis/schema.js";
 import type { ThreatEvidence } from "../threat-intel/types.js";
-
-const INJECTION_PATTERNS = [
-  /ignore.*?instructions/i,
-  /forget.*?instructions/i,
-  /ignore.*?rules/i,
-  /ignore.*?directions/i,
-  /system prompt/i,
-  /bypass rules/i,
-  /you are now a/i,
-  /print.*?instructions/i,
-  /print.*?prompt/i,
-];
 
 function toAIInput(
   type: "message" | "url" | "call" | "screenshot",
@@ -47,13 +35,6 @@ export async function executeAnalysisPipeline(
   content: string,
   type: "message" | "url" | "call" | "screenshot" = "message",
 ): Promise<PipelineResult> {
-  // PRE-FLIGHT: Prompt Injection & Jailbreak Defense
-  if (INJECTION_PATTERNS.some((pattern) => pattern.test(content))) {
-    throw new ValidationError(
-      "Input rejected: Potential prompt injection or jailbreak attempt detected.",
-    );
-  }
-
   const provider = getAIProvider();
 
   // PRIVACY: scrub personal data before it leaves our server
@@ -80,8 +61,18 @@ export async function executeAnalysisPipeline(
     ? aggregateThreatIntel(urlMatch)
     : Promise.resolve([]);
 
+  // Resilient AI Provider call: if AI provider times out, fails, or throws,
+  // gracefully fall back to deterministic offline analyzer so user is never denied safety advice.
+  const aiAnalysisPromise = provider.analyzeScam(aiInput).catch((aiError) => {
+    console.warn(
+      "[pipeline] AI provider failed or timed out. Falling back to deterministic offline analyzer:",
+      aiError,
+    );
+    return analyzeOfflineScam(aiInput);
+  });
+
   const [aiAnalysis, threatIntel] = await Promise.all([
-    provider.analyzeScam(aiInput),
+    aiAnalysisPromise,
     threatIntelPromise,
   ]);
 
@@ -90,11 +81,27 @@ export async function executeAnalysisPipeline(
 
   /*
    * ScamLens owns the final risk decision:
-   * Gemini provides semantic evidence;
-   * The deterministic risk engine calculates the final score and risk level.
+   * Deterministic hard tripwires and threat intelligence take safety precedence;
+   * Strong AI evidence cannot be demoted.
    */
   let risk = analyzeCombinedRisk(content, aiAnalysis);
   const warningSigns = [...aiAnalysis.warningSigns];
+
+  // Merge any deterministic signals that are not already present in warningSigns
+  for (const sig of risk.signals) {
+    const alreadyPresent = warningSigns.some(
+      (w) =>
+        w.type.toLowerCase() === sig.signal.toLowerCase() ||
+        w.explanation.toLowerCase().includes(sig.signal.toLowerCase()),
+    );
+    if (!alreadyPresent) {
+      warningSigns.push({
+        type: sig.signal,
+        severity: sig.weight >= 25 ? "high" : "medium",
+        explanation: sig.explanation,
+      });
+    }
+  }
 
   if (isMaliciousUrl) {
     const maliciousFinding = threatIntel.find((t) => t.verdict === "malicious");
