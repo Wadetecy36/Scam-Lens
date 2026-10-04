@@ -33,6 +33,11 @@ export const env = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   aiApiKey: process.env.AI_API_KEY ?? "",
   virustotalApiKey: process.env.VIRUSTOTAL_API_KEY ?? "",
+  twilioAuthToken: process.env.TWILIO_AUTH_TOKEN ?? "",
+  twilioWebhookUrl: process.env.TWILIO_WEBHOOK_URL ?? "",
+  whatsappAppSecret: process.env.WHATSAPP_APP_SECRET ?? process.env.META_APP_SECRET ?? "",
+  whatsappVerifyToken: process.env.WHATSAPP_VERIFY_TOKEN ?? "scamlens_verify_token",
+  dataDir: process.env.SCAMLENS_DATA_DIR ?? "",
   allowedOrigins: [
     ...DEFAULT_ALLOWED_ORIGINS,
     ...parseOrigins(process.env.ALLOWED_ORIGINS),

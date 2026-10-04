@@ -1,6 +1,17 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import crypto from "node:crypto";
 import { sendError, sendJson, sendText, sendXml } from "../http.js";
 import { executeAnalysisPipeline } from "../services/analysis-pipeline.js";
+import {
+  verifyTwilioWebhookSignature,
+  verifyMetaWebhookSignature,
+  checkAndRecordTwilioSid,
+  checkMetaTimestampValidity,
+} from "../security/webhook-auth.js";
+import {
+  sanitizeAnalysisForStorage,
+  savePublicResult,
+} from "../services/result-store.js";
 import { env } from "../env.js";
 
 const MAX_BODY_BYTES = 35_000;
@@ -48,6 +59,7 @@ function escapeXml(unsafe: string): string {
 
 export function formatWhatsAppReply(
   analysis: Awaited<ReturnType<typeof executeAnalysisPipeline>>["analysis"],
+  resultId?: string,
 ): string {
   const emoji =
     analysis.riskLevel === "HIGH"
@@ -75,13 +87,27 @@ export function formatWhatsAppReply(
     }
   }
 
-  reply += `\n👉 *Full Report & USSD Checks:*\nhttps://scam-lens-blue.vercel.app/result/${analysis.id}`;
+  const idToUse = resultId || analysis.id;
+  reply += `\n👉 *Full Report & USSD Checks:*\nhttps://scam-lens-blue.vercel.app/result/${idToUse}`;
 
   return reply;
 }
 
+function reconstructFullUrl(req: IncomingMessage): string {
+  if (process.env.TWILIO_WEBHOOK_URL) {
+    return process.env.TWILIO_WEBHOOK_URL;
+  }
+  const proto = (req.headers["x-forwarded-proto"] as string) || "https";
+  const host =
+    (req.headers["x-forwarded-host"] as string) ||
+    req.headers.host ||
+    "localhost";
+  return `${proto}://${host}${req.url ?? ""}`;
+}
+
 /**
  * Handles incoming WhatsApp webhook requests from Twilio or Meta WhatsApp Cloud API.
+ * Strictly verifies provider signatures before executing any downstream analysis.
  */
 export async function handleWhatsAppWebhook(
   req: IncomingMessage,
@@ -95,12 +121,21 @@ export async function handleWhatsAppWebhook(
     const token = urlObj.searchParams.get("hub.verify_token");
     const challenge = urlObj.searchParams.get("hub.challenge");
 
-    const expectedToken = process.env.WHATSAPP_VERIFY_TOKEN || "scamlens_verify_token";
+    const expectedToken =
+      process.env.WHATSAPP_VERIFY_TOKEN || env.whatsappVerifyToken || "scamlens_verify_token";
 
-    if (mode === "subscribe" && token === expectedToken) {
-      console.log("[whatsapp] Meta webhook verified successfully.");
-      sendText(res, 200, challenge ?? "");
-      return;
+    if (mode === "subscribe" && token && expectedToken) {
+      const tokenBuf = Buffer.from(token, "utf8");
+      const expectedBuf = Buffer.from(expectedToken, "utf8");
+
+      if (
+        tokenBuf.length === expectedBuf.length &&
+        crypto.timingSafeEqual(tokenBuf, expectedBuf)
+      ) {
+        console.log("[whatsapp] Meta webhook verified successfully.");
+        sendText(res, 200, challenge ?? "");
+        return;
+      }
     }
 
     sendError(res, 403, "FORBIDDEN", "Webhook verification token mismatch.");
@@ -121,11 +156,54 @@ export async function handleWhatsAppWebhook(
     // Scenario A: Twilio WhatsApp Webhook (urlencoded)
     // ----------------------------------------------------
     if (contentType.includes("application/x-www-form-urlencoded")) {
+      const twilioSignature = req.headers["x-twilio-signature"] as string | undefined;
+      const twilioAuthToken =
+        process.env.TWILIO_AUTH_TOKEN || env.twilioAuthToken || (env.nodeEnv === "test" ? "test_twilio_token" : "");
+
+      // FAIL-CLOSED: Authentication MUST occur BEFORE any AI, threat-intel, or parsing
+      if (!twilioSignature) {
+        sendError(res, 401, "UNAUTHORIZED", "Missing Twilio webhook signature.");
+        return;
+      }
+
+      if (!twilioAuthToken) {
+        console.error("[whatsapp:twilio] TWILIO_AUTH_TOKEN is not configured on server.");
+        sendError(res, 500, "CONFIGURATION_ERROR", "Webhook authentication is not configured.");
+        return;
+      }
+
       const params = new URLSearchParams(rawBody);
+      const paramsObj: Record<string, string> = {};
+      for (const [key, val] of params.entries()) {
+        paramsObj[key] = val;
+      }
+
+      const fullUrl = reconstructFullUrl(req);
+      const isSignatureValid = verifyTwilioWebhookSignature({
+        signature: twilioSignature,
+        url: fullUrl,
+        params: paramsObj,
+        authToken: twilioAuthToken,
+      });
+
+      if (!isSignatureValid) {
+        console.warn("[whatsapp:twilio] Rejected request with invalid Twilio signature.");
+        sendError(res, 403, "FORBIDDEN", "Invalid webhook signature.");
+        return;
+      }
+
+      // Replay check on MessageSid
+      const messageSid = params.get("MessageSid") || undefined;
+      if (!checkAndRecordTwilioSid(messageSid)) {
+        console.warn(`[whatsapp:twilio] Rejected replayed MessageSid: ${messageSid}`);
+        sendError(res, 403, "FORBIDDEN", "Duplicate message replay detected.");
+        return;
+      }
+
       const incomingText = params.get("Body")?.trim() || "";
       const sender = params.get("From") || "Unknown";
 
-      console.log(`[whatsapp:twilio] Received message from ${sender}: ${incomingText.slice(0, 60)}...`);
+      console.log(`[whatsapp:twilio] Validated message from ${sender}: ${incomingText.slice(0, 60)}...`);
 
       if (!incomingText) {
         const greeting = `👋 *Welcome to ScamLens Ghana!*
@@ -143,8 +221,13 @@ We will scan it instantly and advise you before you send money or dial any PIN.`
       }
 
       // Execute ScamLens detection pipeline
-      const { analysis } = await executeAnalysisPipeline(incomingText, "message");
-      const replyMessage = formatWhatsAppReply(analysis);
+      const { analysis, threatIntel } = await executeAnalysisPipeline(incomingText, "message");
+
+      // Persist the sanitized public result so the link works for the recipient
+      const sanitized = sanitizeAnalysisForStorage(analysis, threatIntel, "whatsapp");
+      await savePublicResult(sanitized);
+
+      const replyMessage = formatWhatsAppReply(analysis, sanitized.id);
 
       const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -158,17 +241,55 @@ We will scan it instantly and advise you before you send money or dial any PIN.`
     // ----------------------------------------------------
     // Scenario B: Meta Cloud API / JSON Webhook
     // ----------------------------------------------------
+    const metaSignature = req.headers["x-hub-signature-256"] as string | undefined;
+    const metaAppSecret =
+      process.env.WHATSAPP_APP_SECRET ||
+      process.env.META_APP_SECRET ||
+      env.whatsappAppSecret ||
+      (env.nodeEnv === "test" ? "test_app_secret" : "");
+
+    // FAIL-CLOSED: Authentication MUST occur BEFORE any expensive AI or parsing
+    if (!metaSignature) {
+      sendError(res, 401, "UNAUTHORIZED", "Missing Meta webhook signature.");
+      return;
+    }
+
+    if (!metaAppSecret) {
+      console.error("[whatsapp:meta] WHATSAPP_APP_SECRET is not configured on server.");
+      sendError(res, 500, "CONFIGURATION_ERROR", "Webhook authentication is not configured.");
+      return;
+    }
+
+    const isMetaSigValid = verifyMetaWebhookSignature({
+      signatureHeader: metaSignature,
+      rawBody,
+      appSecret: metaAppSecret,
+    });
+
+    if (!isMetaSigValid) {
+      console.warn("[whatsapp:meta] Rejected request with invalid Meta signature.");
+      sendError(res, 403, "FORBIDDEN", "Invalid webhook signature.");
+      return;
+    }
+
     let json: Record<string, unknown> = {};
     try {
       json = JSON.parse(rawBody);
     } catch {
-      sendError(res, 400, "INVALID_JSON", "Expected valid JSON or urlencoded body.");
+      sendError(res, 400, "INVALID_JSON", "Expected valid JSON body.");
       return;
     }
 
-    // Direct JSON test or standard payload
-    const directText = typeof json.text === "string" ? json.text : undefined;
     const metaMessage = (json as any)?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+
+    // Replay/timestamp check
+    if (!checkMetaTimestampValidity(metaMessage?.timestamp)) {
+      console.warn("[whatsapp:meta] Message timestamp is stale or invalid.");
+      sendError(res, 403, "FORBIDDEN", "Message timestamp expired or invalid.");
+      return;
+    }
+
+    const directText = typeof json.text === "string" ? json.text : undefined;
     const incomingText = (metaMessage?.text?.body || directText || "").trim();
     const recipientFrom = metaMessage?.from || (json as any)?.from;
 
@@ -181,7 +302,12 @@ We will scan it instantly and advise you before you send money or dial any PIN.`
     }
 
     const { analysis, threatIntel } = await executeAnalysisPipeline(incomingText, "message");
-    const formattedReply = formatWhatsAppReply(analysis);
+
+    // Persist sanitized result
+    const sanitized = sanitizeAnalysisForStorage(analysis, threatIntel, "whatsapp");
+    await savePublicResult(sanitized);
+
+    const formattedReply = formatWhatsAppReply(analysis, sanitized.id);
 
     // If Meta Cloud API credentials are provided, send an outbound response
     const token = process.env.WHATSAPP_TOKEN;

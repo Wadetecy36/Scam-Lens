@@ -2,6 +2,10 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { sendError, sendJson } from "../http.js";
 import { parseAnalyzeRequest, ValidationError } from "../validation/analyze.js";
 import { executeAnalysisPipeline } from "../services/analysis-pipeline.js";
+import {
+  sanitizeAnalysisForStorage,
+  savePublicResult,
+} from "../services/result-store.js";
 
 const MAX_BODY_BYTES = 25_000;
 
@@ -36,7 +40,6 @@ async function readBody(req: IncomingMessage): Promise<unknown> {
   });
 }
 
-
 export async function handleAnalyze(
   req: IncomingMessage,
   res: ServerResponse,
@@ -48,6 +51,12 @@ export async function handleAnalyze(
       input.content,
       input.type,
     );
+
+    // Persist sanitized result for shareable /result/:id links
+    const sanitized = sanitizeAnalysisForStorage(analysis, threatIntel, "web");
+    await savePublicResult(sanitized);
+
+    analysis.id = sanitized.id;
 
     sendJson(res, 200, {
       ok: true,

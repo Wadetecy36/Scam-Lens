@@ -117,3 +117,22 @@ export async function runScamAnalysis(
 ): Promise<ScamAnalysis> {
   return activeProvider.analyzeScam(input);
 }
+
+export async function fetchPublicResult(id: string): Promise<ScamAnalysis | null> {
+  if (!id) return null;
+
+  try {
+    const response = await fetch(`${env.apiUrl}/api/results/${encodeURIComponent(id)}`);
+    if (!response.ok) {
+      return null;
+    }
+    const json = (await response.json()) as { ok?: boolean; result?: unknown };
+    if (!json?.ok || !json?.result) {
+      return null;
+    }
+    return parseScamAnalysis(json.result);
+  } catch (err) {
+    console.warn(`[ScamLens] Failed to fetch public result ${id}:`, err);
+    return null;
+  }
+}

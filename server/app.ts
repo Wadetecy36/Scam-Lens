@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { isOriginAllowed, sendError, sendJson, setCorsHeaders, handleCorsPreflight } from "./http.js";
 import { handleAnalyze } from "./routes/analyze.js";
 import { handleWhatsAppWebhook } from "./routes/whatsapp.js";
+import { handleGetResult } from "./routes/results.js";
 import { checkRateLimit } from "./middleware/rate-limiter.js";
 
 /**
@@ -45,6 +46,13 @@ export async function handleRequest(
     if (req.method === "POST" && path === "/api/analyze") {
       if (checkRateLimit(req, res)) return;
       await handleAnalyze(req, res);
+      return;
+    }
+
+    // Public sanitized result lookup by ID (e.g. /api/results/an_12345)
+    if (req.method === "GET" && path.startsWith("/api/results/")) {
+      const id = path.slice("/api/results/".length);
+      await handleGetResult(req, res, id);
       return;
     }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -21,28 +21,69 @@ import { Alert } from "@/components/ui/Alert";
 import { ReadAloudButton } from "@/components/voice/ReadAloudButton";
 import { getResult } from "@/lib/result-store";
 import { listHistory, saveToHistory } from "@/services/history-service";
+import { fetchPublicResult } from "@/services/analysis-service";
+import type { ScamAnalysis } from "@/ai/scam-analysis/schema";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { track } from "@/lib/analytics";
 
 export function ResultPage() {
   const { id } = useParams();
-  const result = id ? getResult(id) : undefined;
+  const localResult = id ? getResult(id) : undefined;
+  const [fetchedAnalysis, setFetchedAnalysis] = useState<ScamAnalysis | null>(null);
+  const [loading, setLoading] = useState(!localResult && !!id);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    if (!localResult && id) {
+      let cancelled = false;
+      setLoading(true);
+      fetchPublicResult(id).then((data) => {
+        if (cancelled) return;
+        if (data) {
+          setFetchedAnalysis(data);
+        } else {
+          setNotFound(true);
+        }
+        setLoading(false);
+      });
+      return () => {
+        cancelled = true;
+      };
+    } else {
+      setLoading(false);
+    }
+  }, [id, localResult]);
+
+  const analysis: ScamAnalysis | undefined = localResult?.analysis ?? fetchedAnalysis ?? undefined;
+
   useDocumentHead({
-    title: result ? "Your ScamLens result" : "Result unavailable",
-    description: result
+    title: analysis ? "Your ScamLens result" : "Result unavailable",
+    description: analysis
       ? "See what ScamLens recommends you do next."
-      : "This ScamLens result is no longer available in this session.",
+      : "This ScamLens result is no longer available or has expired.",
     path: `/result/${id ?? "unknown"}`,
     index: false,
   });
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saved, setSaved] = useState(() => !!id && listHistory().some((entry) => entry.id === id));
 
-  if (!result) {
+  if (loading) {
+    return (
+      <main className="container-page py-20 text-center">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue animate-pulse">
+          <ShieldCheck size={32} />
+        </div>
+        <p className="mt-4 text-base font-bold text-navy">Loading ScamLens report…</p>
+        <p className="mt-1 text-sm text-foreground-soft">Checking safety records</p>
+      </main>
+    );
+  }
+
+  if (!analysis || notFound) {
     return (
       <main className="container-page py-14">
         <Alert tone="warning" title="This result is no longer available.">
-          Results are kept in this session only. If you refreshed the page, check it again to create a new result.
+          Security reports expire after 30 days or may have been cleared. If you need a new check, you can scan the message again below.
         </Alert>
         <Link to="/analyze" className={buttonClasses({ className: "mt-6 inline-flex" })}>
           Check something
@@ -51,7 +92,6 @@ export function ResultPage() {
     );
   }
 
-  const { analysis } = result;
   const topAction = analysis.recommendedActions[0] ?? "Don't click, reply, or send money until you've verified it.";
 
   const currentUrl = typeof window !== "undefined" ? window.location.href : `https://scam-lens-blue.vercel.app/result/${id}`;
@@ -62,6 +102,7 @@ export function ResultPage() {
   const whatsAppAskFamilyUrl = `https://wa.me/?text=${encodeURIComponent(askFamilyText)}`;
 
   function save() {
+    if (!analysis) return;
     saveToHistory(analysis);
     setSaved(true);
     track("result_saved", { riskLevel: analysis.riskLevel });
