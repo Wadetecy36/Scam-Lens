@@ -18,9 +18,9 @@ export function OfflineBanner() {
   if (!isOffline) return null;
 
   return (
-    <div role="status" className="flex items-center justify-center gap-2 bg-foreground py-2 text-sm text-background">
-      <WifiOff aria-hidden="true" size={15} />
-      You're offline. Reconnect to analyze a message.
+    <div role="status" className="flex items-center justify-center gap-2 bg-amber-600 px-4 py-2 text-sm font-medium text-white shadow-sm">
+      <WifiOff aria-hidden="true" size={16} className="text-amber-200" />
+      <span>Offline Safety Mode Active — On-device scanner is protecting you without mobile data.</span>
     </div>
   );
 }

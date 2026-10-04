@@ -10,6 +10,7 @@ import {
   Globe,
   ShieldAlert,
   CheckCircle2,
+  Zap,
 } from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
@@ -48,6 +49,23 @@ export function ResultPage() {
       <div className="mt-6">
         <RiskHeader level={analysis.riskLevel} score={analysis.riskScore} showScale={false} />
       </div>
+
+      {analysis.id.startsWith("offline_") && (
+        <aside
+          className="mt-5 rounded-[var(--radius-card)] border border-amber-200 bg-amber-50/80 p-4 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200"
+          aria-label="Offline Mode Notice"
+        >
+          <div className="flex items-start gap-3">
+            <Zap className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" size={19} aria-hidden="true" />
+            <div className="text-sm">
+              <strong className="font-semibold">Analyzed in Offline Safety Mode (Zero Data)</strong>
+              <p className="mt-0.5 text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
+                This check was computed directly on your device without internet data using local scam pattern rules. When you are back online, you can re-run this check for full AI and live cybersecurity database scans.
+              </p>
+            </div>
+          </div>
+        </aside>
+      )}
 
       <section className="mt-8 rounded-[var(--radius-card)] border border-border/10 bg-white/60 p-5 sm:p-6" aria-labelledby="action-heading">
         <div className="flex items-start gap-3">

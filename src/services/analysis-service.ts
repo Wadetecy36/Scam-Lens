@@ -1,4 +1,5 @@
 import { MockAIProvider } from "@/ai/providers/mock-provider";
+import { OfflineRiskProvider } from "@/ai/providers/offline-provider";
 import type { AIProvider } from "@/ai/scam-analysis/analyzer";
 import { AnalysisRequestError } from "@/ai/scam-analysis/analyzer";
 import type { ScamAnalysis, ScamAnalysisInput } from "@/ai/scam-analysis/schema";
@@ -9,16 +10,25 @@ export class ServerBackedAIProvider implements AIProvider {
   readonly name = "server";
   private readonly baseUrl: string;
   private readonly fallbackProvider: AIProvider;
+  private readonly offlineProvider: AIProvider;
 
   constructor(
     baseUrl: string = env.apiUrl,
     fallbackProvider: AIProvider = new MockAIProvider(),
+    offlineProvider: AIProvider = new OfflineRiskProvider(),
   ) {
     this.baseUrl = baseUrl;
     this.fallbackProvider = fallbackProvider;
+    this.offlineProvider = offlineProvider;
   }
 
   async analyzeScam(input: ScamAnalysisInput): Promise<ScamAnalysis> {
+    const isClientOffline = typeof navigator !== "undefined" && !navigator.onLine;
+    if (isClientOffline) {
+      console.info("[ScamLens] Network offline. Using on-device offline safety engine.");
+      return this.offlineProvider.analyzeScam(input);
+    }
+
     const content =
       input.type === "url" ? input.url ?? "" : input.text ?? "";
     const type = input.type === "image" ? "screenshot" : input.type;
@@ -63,6 +73,20 @@ export class ServerBackedAIProvider implements AIProvider {
       // If the backend specifically rejected the input (e.g., prompt injection, rate limit), surface it immediately
       if (msg.includes("Input rejected") || msg.includes("Too Many Requests")) {
         throw new AnalysisRequestError(msg, err);
+      }
+
+      // If network is down, failed to fetch, or timed out, gracefully use on-device offline analysis
+      const isNetworkIssue =
+        (typeof navigator !== "undefined" && !navigator.onLine) ||
+        msg.includes("Failed to fetch") ||
+        msg.includes("NetworkError") ||
+        msg.includes("fetch failed") ||
+        msg.includes("aborted") ||
+        msg.includes("abort");
+
+      if (isNetworkIssue) {
+        console.warn("[ScamLens] Network unreachable. Falling back to on-device offline engine:", err);
+        return this.offlineProvider.analyzeScam(input);
       }
 
       if (env.useMockAnalysis) {
