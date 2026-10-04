@@ -1,0 +1,46 @@
+name: Nightly Scam Scenario Audit
+
+on:
+  schedule:
+    # Runs daily at midnight UTC
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: Nightly Scenario & Threat Regression
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Regional & Threat Intel Audits
+        id: test_audit
+        run: npx vitest run server/risk/ghana-scenarios.test.ts server/threat-intel/ssrf-guard.test.ts server/privacy/pii-redactor.test.ts
+
+      - name: Open Issue on Regression Failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Automated Alert: Nightly Scam Scenario Audit Failed',
+              body: `The automated nightly scenario audit failed on branch \`${context.ref}\`.\n\nPlease check the [Actions Run Log](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for failure details.`,
+              labels: ['bug', 'security', 'regression']
+            });
