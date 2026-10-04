@@ -19,13 +19,13 @@ export function ReadAloudButton({ text, className }: ReadAloudButtonProps) {
   };
 
   return (
-    <div className={cn("inline-flex items-center gap-1 rounded-full border border-border/15 bg-white/70 p-1", className)}>
+    <div className={cn("inline-flex items-center gap-1 rounded-full border border-border bg-white p-1 shadow-2xs", className)}>
       {status === "playing" ? (
         <button
           type="button"
           onClick={pause}
           aria-label="Pause reading"
-          className="tap-target flex items-center justify-center rounded-full px-3 text-primary"
+          className="tap-target flex items-center justify-center rounded-full px-3 text-blue hover:text-navy transition-colors"
         >
           <Pause aria-hidden="true" size={18} />
         </button>
@@ -34,10 +34,10 @@ export function ReadAloudButton({ text, className }: ReadAloudButtonProps) {
           type="button"
           onClick={handlePlay}
           aria-label={status === "paused" ? "Resume reading aloud" : "Read aloud"}
-          className="tap-target flex items-center justify-center gap-1.5 rounded-full px-3 text-primary"
+          className="tap-target flex items-center justify-center gap-1.5 rounded-full px-3.5 py-1 text-blue hover:text-navy transition-colors"
         >
           {status === "paused" ? <Play aria-hidden="true" size={18} /> : <Volume2 aria-hidden="true" size={18} />}
-          <span className="text-sm font-medium">Read aloud</span>
+          <span className="text-sm font-semibold">Read aloud</span>
         </button>
       )}
       {status !== "idle" && (
@@ -45,7 +45,7 @@ export function ReadAloudButton({ text, className }: ReadAloudButtonProps) {
           type="button"
           onClick={stop}
           aria-label="Stop reading"
-          className="tap-target flex items-center justify-center rounded-full px-3 text-foreground-soft"
+          className="tap-target flex items-center justify-center rounded-full px-3 text-foreground-soft hover:text-navy transition-colors"
         >
           <Square aria-hidden="true" size={14} />
         </button>

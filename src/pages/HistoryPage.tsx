@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, ArrowLeft, Clock } from "lucide-react";
 import { RiskPill } from "@/components/risk/RiskPill";
 import { Button } from "@/components/ui/Button";
 import { buttonClasses } from "@/components/ui/button-classes";
@@ -8,10 +8,14 @@ import { Alert } from "@/components/ui/Alert";
 import { listHistory, deleteHistoryEntry, clearHistory, type HistoryEntry } from "@/services/history-service";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 
-const TYPE_LABELS = { message: "Message", image: "Screenshot", url: "Link", call: "Call" } as const;
+const TYPE_LABELS = { message: "Message", image: "Screenshot", url: "Link", call: "Phone Call" } as const;
 
 export function HistoryPage() {
-  useDocumentHead({ title: "History", description: "Review the scam checks you've chosen to save on this device.", path: "/history" });
+  useDocumentHead({
+    title: "Saved History",
+    description: "Review the scam checks you've chosen to save on this device.",
+    path: "/history",
+  });
   const [entries, setEntries] = useState<HistoryEntry[]>(() =>
     typeof window !== "undefined" ? listHistory() : [],
   );
@@ -28,52 +32,65 @@ export function HistoryPage() {
 
   return (
     <main className="container-page py-10 sm:py-14">
-      <div className="flex items-end justify-between gap-4">
+      <Link
+        to="/"
+        className="tap-target inline-flex items-center gap-2 text-sm font-semibold text-blue hover:underline"
+      >
+        <ArrowLeft aria-hidden="true" size={16} />
+        Back home
+      </Link>
+
+      <div className="mt-8 flex items-center justify-between gap-4">
         <div>
-          <h1 className="mt-1 font-heading text-4xl">History</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-navy">Saved History</h1>
+          <p className="mt-2 text-sm sm:text-base text-foreground-soft">
+            Only lightweight result details are saved here on your device. Your original messages or screenshots are never stored.
+          </p>
         </div>
         {entries.length > 0 && (
-          <Button variant="light" onClick={clear}>
+          <Button variant="secondary" onClick={clear}>
             Clear all
           </Button>
         )}
       </div>
-      <p className="mt-4 text-foreground-soft">
-        Only lightweight result details are saved here. Your original message or
-        screenshot isn't stored in history.
-      </p>
+
       {entries.length === 0 ? (
-        <div className="mt-8">
+        <div className="mt-8 max-w-xl">
           <Alert title="No saved checks yet.">
-            When you save a result, you'll find its risk level and basic details here.
+            When you check a message and click "Save result", its verdict and security tips will be safely preserved here on your phone or browser.
           </Alert>
           <Link
             to="/analyze"
-            className={buttonClasses({ className: "mt-5 inline-flex" })}
+            className={buttonClasses({ className: "mt-6 inline-flex" })}
           >
-            Check something
+            Check something now
           </Link>
         </div>
       ) : (
-        <div className="mt-8 space-y-3">
+        <div className="mt-8 space-y-3 max-w-3xl">
           {entries.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center gap-3 rounded-[var(--radius-card)] border border-border/10 bg-white/50 p-4"
+              className="group flex items-center gap-4 rounded-2xl border border-border bg-white p-5 shadow-2xs transition-all hover:border-blue hover:shadow-sm"
             >
-              <Link to={`/result/${entry.id}`} className="min-w-0 flex-1">
-                <RiskPill level={entry.riskLevel} score={entry.riskScore} />
-                <p className="mt-2 text-sm font-medium">
-                  {TYPE_LABELS[entry.inputType]} ·{" "}
+              <Link to={`/result/${entry.id}`} className="min-w-0 flex-1 focus:outline-none">
+                <div className="flex items-center gap-3">
+                  <RiskPill level={entry.riskLevel} score={entry.riskScore} />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+                    {TYPE_LABELS[entry.inputType]}
+                  </span>
+                </div>
+                <p className="mt-2 text-base font-bold text-navy capitalize group-hover:text-blue transition-colors">
                   {entry.category.replaceAll("_", " ")}
                 </p>
-                <p className="mt-1 text-xs text-foreground-soft">
-                  {new Date(entry.createdAt).toLocaleString()}
-                </p>
+                <div className="mt-1 flex items-center gap-1.5 text-xs text-secondary">
+                  <Clock size={12} aria-hidden="true" />
+                  <span>{new Date(entry.createdAt).toLocaleString()}</span>
+                </div>
               </Link>
               <button
                 type="button"
-                className="tap-target rounded-full p-2 text-foreground-soft hover:bg-foreground/5"
+                className="tap-target rounded-xl p-2.5 text-secondary hover:bg-red-soft hover:text-red transition-colors"
                 onClick={() => remove(entry.id)}
                 aria-label="Delete saved check"
               >

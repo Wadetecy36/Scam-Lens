@@ -16,39 +16,39 @@ import { useStructuredData } from "@/hooks/useStructuredData";
 
 const EXAMPLES = [
   {
+    label: "Fake MoMo Reversal",
+    text: "Payment received for GHS 500.00 from KWAME ASANTE. Current Balance: GHS 520.00. Reference: 2948201938. Please refund mistakenly sent funds immediately.",
+  },
+  {
     label: "Bank warning",
-    text: "Your bank account will be blocked today. Verify your account immediately using this link.",
+    text: "Your bank account will be blocked today due to Ghana Card verification failure. Verify your credentials immediately using this link.",
   },
   {
-    label: "Prize",
-    text: "Congratulations! You have won a cash prize. Pay the processing fee to claim your winnings.",
+    label: "Prize lottery",
+    text: "Congratulations! You have won a cash prize of GHS 10,000 in the promo draw. Pay the processing fee of GHS 150 to claim your winnings.",
   },
   {
-    label: "Investment",
-    text: "Invest $500 today and receive guaranteed profit within 24 hours. Risk-free investment.",
-  },
-  {
-    label: "Delivery",
-    text: "Your package is waiting. Pay the small delivery fee today to avoid returning the package.",
+    label: "Urgent package",
+    text: "Your delivery package is waiting at customs. Pay the small clearance fee today to avoid returning the package to sender.",
   },
 ];
 
 const FAQS = [
   {
-    q: "Can ScamLens guarantee that something is safe?",
-    a: "No. ScamLens looks for common warning signs and explains what it finds. A low-risk result is not a guarantee that something is legitimate.",
+    q: "Can ScamLens guarantee that something is completely safe?",
+    a: "No. ScamLens looks for known scam patterns, manipulative pressure, and suspicious links. A low-risk result means no obvious red flags were spotted, but you should always stay cautious.",
   },
   {
-    q: "What should I never share?",
-    a: "Never give anyone your password, PIN, OTP, banking credentials, recovery code, or other sensitive security information just because a message asks for it.",
+    q: "What information should I never share?",
+    a: "Never enter or give anyone your Mobile Money PIN, banking passwords, one-time SMS verification codes (OTP), or Ghana Card PIN numbers. Legitimate banks and telecoms will never ask for them.",
   },
   {
-    q: "Does ScamLens store my messages?",
-    a: "Saved history contains lightweight result information. Your original message or screenshot is not written to your saved history.",
+    q: "Does ScamLens store my private messages?",
+    a: "No. ScamLens only saves lightweight result scores on your local device if you explicitly choose to click 'Save result'. Your original messages are not permanently stored.",
   },
   {
-    q: "Do I need someone else to use ScamLens?",
-    a: "No. You can use ScamLens completely on your own. You can also choose to involve someone you trust when you want a second opinion.",
+    q: "Do I need technical skills to use this?",
+    a: "Not at all. ScamLens is designed for parents, elders, market vendors, and students. Everything is explained in clear, plain language with direct advice on what to do.",
   },
 ];
 
@@ -58,7 +58,7 @@ export function LandingPage() {
   useDocumentHead({
     title: "Before you click, check",
     description:
-      "ScamLens checks suspicious messages, screenshots, links, calls, and online offers for common scam warning signs.",
+      "ScamLens checks suspicious messages, screenshots, links, calls, and online offers for common scam warning signs in Ghana.",
     path: "/",
   });
 
@@ -67,9 +67,9 @@ export function LandingPage() {
       "@context": "https://schema.org",
       "@type": "WebSite",
       name: "ScamLens",
-      url: "https://scamlens.example.com",
+      url: "https://scam-lens-blue.vercel.app",
       description:
-        "An AI safety check for suspicious messages, links, screenshots, calls, and online offers.",
+        "An AI and threat-intelligence safety check for suspicious messages, links, screenshots, and MoMo transfers.",
     },
     "website",
   );
@@ -79,117 +79,115 @@ export function LandingPage() {
     : "/analyze/message";
 
   return (
-    <main className="bg-background min-h-screen text-foreground font-sans">
+    <main className="bg-surface min-h-screen text-navy font-sans">
       {/* HERO SECTION */}
-      <section className="py-16 sm:py-24 lg:py-32">
+      <section className="py-12 sm:py-20 lg:py-24">
         <div className="container-page">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
-            <div>
-              <h1 className="text-balance font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
-                Not sure?
-                <br />
-                <span className="text-primary">Check first.</span>
+          <div className="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-14">
+            <div className="lg:col-span-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue/20 bg-blue-light px-3.5 py-1 text-xs font-semibold text-blue">
+                <ShieldCheck size={14} aria-hidden="true" />
+                <span>Financial & Digital Safety for Ghana</span>
+              </div>
+
+              <h1 className="mt-5 text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-navy leading-[1.12]">
+                Before you click, <br />
+                <span className="text-blue">check first.</span>
               </h1>
-              
-              <p className="text-balance mt-6 max-w-lg text-lg text-muted-foreground sm:text-xl">
-                Paste something suspicious below. ScamLens checks it for common
-                scam warning signs and tells you what to look out for.
+
+              <p className="mt-5 max-w-lg text-base sm:text-lg leading-relaxed text-foreground-soft">
+                Paste any suspicious text, WhatsApp message, MoMo alert, or link. ScamLens analyzes it in seconds and explains in plain language whether it is safe.
               </p>
-              
+
               {/* QUICK TRUST SIGNALS */}
-              <div className="mt-8 flex flex-col gap-4 text-base font-semibold text-muted-foreground">
+              <div className="mt-8 flex flex-col gap-3.5 text-sm font-semibold text-foreground-soft">
                 <span className="inline-flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
-                    <ShieldCheck size={18} aria-hidden="true" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-blue-icon-bg text-blue">
+                    <ShieldCheck size={16} aria-hidden="true" />
                   </div>
-                  Plain-language results
+                  Plain-language advice — no security jargon
                 </span>
                 <span className="inline-flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
-                    <Lock size={18} aria-hidden="true" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-green-soft text-green">
+                    <Lock size={16} aria-hidden="true" />
                   </div>
-                  No security jargon
+                  Zero passwords, PINs, or OTPs required
                 </span>
                 <span className="inline-flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10 text-accent">
-                    <Users size={18} aria-hidden="true" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-purple-soft text-purple">
+                    <Users size={16} aria-hidden="true" />
                   </div>
-                  Built for everyday people
+                  Built for elders, families & small businesses
                 </span>
               </div>
             </div>
 
-            {/* SCANNER */}
-            <div className="bg-card text-card-foreground rounded-2xl shadow-xl p-6 sm:p-8 border border-border">
-              <div className="flex items-center justify-between gap-3">
-                <label
-                  htmlFor="scamlens-message"
-                  className="flex items-center gap-2 text-base font-bold text-foreground"
-                >
-                  <MessageSquare
-                    size={20}
-                    className="text-primary"
-                    aria-hidden="true"
-                  />
-                  What did you receive?
-                </label>
+            {/* LIVE MESSAGE SCANNER CARD */}
+            <div className="lg:col-span-6">
+              <div className="rounded-2xl border border-border bg-white p-6 sm:p-8 shadow-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <label
+                    htmlFor="scamlens-message"
+                    className="flex items-center gap-2 text-sm font-bold text-navy"
+                  >
+                    <MessageSquare size={18} className="text-blue" aria-hidden="true" />
+                    What did you receive?
+                  </label>
 
-                <span className="text-sm font-semibold text-muted-foreground">
-                  {message.length}/3000
-                </span>
-              </div>
-
-              <textarea
-                id="scamlens-message"
-                value={message}
-                onChange={(event) =>
-                  setMessage(event.target.value.slice(0, 3000))
-                }
-                placeholder="Paste a suspicious message, email, or offer here..."
-                className="mt-4 min-h-32 w-full resize-y rounded-lg border border-border bg-background p-4 text-base text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/20"
-                aria-describedby="scanner-privacy"
-              />
-
-              <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div
-                  id="scanner-privacy"
-                  className="flex items-center gap-2 text-sm font-semibold text-muted-foreground"
-                >
-                  <Lock size={16} aria-hidden="true" />
-                  No passwords, OTPs, or PINs needed.
+                  <span className="text-xs font-semibold text-secondary">
+                    {message.length}/3000
+                  </span>
                 </div>
 
-                <Link
-                  to={analyzeHref}
-                  className={buttonClasses({
-                    variant: "accent",
-                    size: "lg",
-                    className: "w-full sm:w-auto shadow-md",
-                  })}
-                >
-                  <Search size={18} aria-hidden="true" />
-                  Analyze message
-                  <ArrowRight size={18} aria-hidden="true" />
-                </Link>
-              </div>
+                <textarea
+                  id="scamlens-message"
+                  value={message}
+                  onChange={(event) => setMessage(event.target.value.slice(0, 3000))}
+                  placeholder="Paste a suspicious SMS, WhatsApp message, email, or offer here..."
+                  className="mt-3.5 min-h-[140px] w-full resize-y rounded-xl border border-border bg-surface p-4 text-base text-navy outline-none transition-all placeholder:text-secondary focus:border-blue focus:ring-4 focus:ring-blue/10"
+                  aria-describedby="scanner-privacy"
+                />
 
-              {/* EXAMPLES */}
-              <div className="mt-8 border-t border-border pt-6">
-                <p className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">
-                  Try an example
-                </p>
+                <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div
+                    id="scanner-privacy"
+                    className="flex items-center gap-1.5 text-xs font-medium text-secondary"
+                  >
+                    <Lock size={14} aria-hidden="true" />
+                    Never enter private PINs or passwords.
+                  </div>
 
-                <div className="flex flex-wrap gap-3">
-                  {EXAMPLES.map((example) => (
-                    <button
-                      key={example.label}
-                      type="button"
-                      onClick={() => setMessage(example.text)}
-                      className="tap-target cursor-pointer rounded-lg border-2 border-border bg-card px-4 py-2 text-sm font-semibold text-muted-foreground transition-all duration-200 hover:border-primary hover:text-primary hover:bg-primary/5"
-                    >
-                      {example.label}
-                    </button>
-                  ))}
+                  <Link
+                    to={analyzeHref}
+                    className={buttonClasses({
+                      size: "lg",
+                      className: "w-full sm:w-auto",
+                    })}
+                  >
+                    <Search size={16} aria-hidden="true" />
+                    Analyze now
+                    <ArrowRight size={16} aria-hidden="true" />
+                  </Link>
+                </div>
+
+                {/* EXAMPLES */}
+                <div className="mt-6 border-t border-border pt-5">
+                  <p className="text-xs font-bold uppercase tracking-wider text-secondary mb-3">
+                    Try a common scam example:
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {EXAMPLES.map((example) => (
+                      <button
+                        key={example.label}
+                        type="button"
+                        onClick={() => setMessage(example.text)}
+                        className="tap-target cursor-pointer rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground-soft transition-all hover:border-blue hover:text-blue hover:bg-blue-light/40"
+                      >
+                        {example.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
@@ -197,52 +195,55 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* VALUE PROP & FEATURES (How It Works) */}
-      <section className="bg-card py-16 sm:py-24 border-y border-border">
+      {/* THREE STEPS SECTION */}
+      <section className="bg-surface-secondary py-16 sm:py-20 border-y border-border">
         <div className="container-page">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="font-display text-4xl font-bold text-foreground sm:text-5xl">
-              Three steps. No security degree required.
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-navy">
+              Three steps. No tech degree required.
             </h2>
-            <p className="mt-6 text-xl text-muted-foreground leading-relaxed">
-              We designed ScamLens to be clean, simple, and straightforward.
+            <p className="mt-4 text-base sm:text-lg text-foreground-soft leading-relaxed">
+              ScamLens is built to be fast, clear, and reassuring.
             </p>
           </div>
 
-          <div className="mx-auto mt-16 grid max-w-5xl gap-10 md:grid-cols-3">
+          <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-3">
             {[
               {
                 number: "01",
                 icon: MessageSquare,
                 title: "Share it",
-                body: "Paste a message, upload a screenshot, check a link, or describe a call.",
+                body: "Paste a text, screenshot a receipt, check a web link, or describe a suspicious call.",
               },
               {
                 number: "02",
                 icon: Zap,
                 title: "We analyze it",
-                body: "ScamLens checks for patterns associated with common scam tactics.",
+                body: "ScamLens compares it against thousands of known fraud patterns and threat databases.",
               },
               {
                 number: "03",
                 icon: ShieldCheck,
-                title: "You decide",
-                body: "Get a clear risk level, reasons, and practical next steps.",
+                title: "You stay safe",
+                body: "Receive a clear risk assessment, warning signs, and official dial codes to verify safely.",
               },
             ].map((step) => (
-              <div key={step.number} className="group p-8 rounded-2xl bg-muted border border-transparent transition-all duration-300 hover:border-border hover:shadow-lg hover:-translate-y-1">
+              <div
+                key={step.number}
+                className="group rounded-2xl border border-border bg-white p-7 transition-all hover:border-blue hover:shadow-sm"
+              >
                 <div className="flex items-center justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-on-primary shadow-md">
-                    <step.icon size={28} aria-hidden="true" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue">
+                    <step.icon size={24} aria-hidden="true" />
                   </div>
-                  <span className="text-3xl font-display font-bold text-border">
+                  <span className="text-2xl font-bold text-border group-hover:text-blue transition-colors">
                     {step.number}
                   </span>
                 </div>
 
-                <h3 className="mt-8 font-display text-2xl font-bold text-foreground">{step.title}</h3>
+                <h3 className="mt-6 text-xl font-bold text-navy">{step.title}</h3>
 
-                <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+                <p className="mt-2 text-sm leading-relaxed text-foreground-soft">
                   {step.body}
                 </p>
               </div>
@@ -251,36 +252,60 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* WHO IS IT FOR */}
-      <section className="bg-background py-16 sm:py-24 border-t border-border">
+      {/* WHO IS IT FOR / GHANA COMMUNITY */}
+      <section className="bg-surface py-16 sm:py-24">
         <div className="container-page">
-          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
-            <div className="order-2 lg:order-1 flex flex-col gap-6">
-              <img src="/images/hero.jpg" alt="Ghanaian mother checking her phone" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[300px]" />
-              <div className="grid grid-cols-2 gap-6">
-                <img src="/images/family.jpg" alt="Younger relative helping an older adult" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[200px]" />
-                <img src="/images/business.jpg" alt="Market trader checking his phone" className="rounded-2xl shadow-lg w-full h-auto object-cover max-h-[200px]" />
+          <div className="grid gap-12 lg:grid-cols-12 lg:items-center">
+            <div className="lg:col-span-6 flex flex-col gap-4">
+              <img
+                src="/images/hero.jpg"
+                alt="Ghanaian mother checking her phone safely"
+                className="rounded-2xl border border-border w-full h-auto object-cover max-h-[280px] shadow-sm"
+              />
+              <div className="grid grid-cols-2 gap-4">
+                <img
+                  src="/images/family.jpg"
+                  alt="Younger relative helping an older adult"
+                  className="rounded-2xl border border-border w-full h-auto object-cover max-h-[180px] shadow-sm"
+                />
+                <img
+                  src="/images/business.jpg"
+                  alt="Market trader checking mobile transactions"
+                  className="rounded-2xl border border-border w-full h-auto object-cover max-h-[180px] shadow-sm"
+                />
               </div>
             </div>
-            <div className="order-1 lg:order-2">
-              <h2 className="font-display text-4xl font-bold text-foreground sm:text-5xl">
-                Built for everyday people.
+
+            <div className="lg:col-span-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-green/20 bg-green-soft px-3 py-1 text-xs font-semibold text-green mb-4">
+                Designed for everyday life
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-bold text-navy tracking-tight">
+                Built for real Ghanaian communities.
               </h2>
-              <p className="mt-6 text-xl text-muted-foreground leading-relaxed">
-                Whether you're a parent receiving a strange WhatsApp message, a market trader getting an unexpected payment link, or someone helping their family stay safe online—ScamLens is built to give you calm, clear advice when you need it most.
+              <p className="mt-4 text-base sm:text-lg text-foreground-soft leading-relaxed">
+                Whether you are a parent receiving a stressful WhatsApp plea, a market trader verifying a customer's MoMo alert, or helping your grandparents avoid SIM swap traps—ScamLens gives you calm, clear answers.
               </p>
-              <ul className="mt-8 space-y-4 text-lg text-foreground font-medium">
+
+              <ul className="mt-6 space-y-3.5 text-base font-semibold text-navy">
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
-                  No technical skills required
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-icon-bg text-blue">
+                    <Zap size={14} aria-hidden="true" />
+                  </div>
+                  No technical jargon or confusing security terms
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
-                  Plain English explanations
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-icon-bg text-blue">
+                    <Zap size={14} aria-hidden="true" />
+                  </div>
+                  Official USSD shortcuts (*170#, *110#, *500#)
                 </li>
                 <li className="flex items-center gap-3">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary"><Zap size={14} aria-hidden="true" /></div>
-                  Fast on mobile networks
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-icon-bg text-blue">
+                    <Zap size={14} aria-hidden="true" />
+                  </div>
+                  Lightweight and ultra-fast on mobile 3G/4G connections
                 </li>
               </ul>
             </div>
@@ -288,61 +313,67 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* TRUST */}
-      <section className="bg-background py-16 sm:py-24">
+      {/* CORE SAFETY PILLARS */}
+      <section className="bg-surface-secondary py-16 sm:py-20 border-t border-border">
         <div className="container-page">
-          <div className="grid gap-8 lg:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-pointer">
-              <Lock className="text-accent" size={32} aria-hidden="true" />
-              <h3 className="mt-6 font-display text-2xl font-bold text-foreground">Keep sensitive information private.</h3>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                ScamLens never needs your passwords, PINs, OTPs, or banking
-                credentials to analyze a suspicious message.
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="rounded-2xl border border-border bg-white p-7 shadow-2xs">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue">
+                <Lock size={22} aria-hidden="true" />
+              </div>
+              <h3 className="mt-5 text-xl font-bold text-navy">Keep sensitive data private.</h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground-soft">
+                ScamLens never needs your passwords, PINs, OTPs, or banking credentials to analyze a suspicious message.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-pointer">
-              <Users className="text-accent" size={32} aria-hidden="true" />
-              <h3 className="mt-6 font-display text-2xl font-bold text-foreground">Get a second opinion.</h3>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                When something looks serious, you can involve someone you trust.
-                The decision is always yours.
+            <div className="rounded-2xl border border-border bg-white p-7 shadow-2xs">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-purple-soft text-purple">
+                <Users size={22} aria-hidden="true" />
+              </div>
+              <h3 className="mt-5 text-xl font-bold text-navy">Get a family second opinion.</h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground-soft">
+                When something looks serious, forward the report to someone you trust on WhatsApp with one click.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-8 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 cursor-pointer">
-              <ShieldCheck className="text-accent" size={32} aria-hidden="true" />
-              <h3 className="mt-6 font-display text-2xl font-bold text-foreground">No false certainty.</h3>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                ScamLens is a safety check, not a guarantee. When in doubt,
-                pause and verify through an official channel.
+            <div className="rounded-2xl border border-border bg-white p-7 shadow-2xs">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-soft text-green">
+                <ShieldCheck size={22} aria-hidden="true" />
+              </div>
+              <h3 className="mt-5 text-xl font-bold text-navy">No false certainty.</h3>
+              <p className="mt-2 text-sm leading-relaxed text-foreground-soft">
+                ScamLens is a safety check, not a guarantee. When in doubt, pause and verify through official channels.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-muted py-16 sm:py-24 border-t border-border">
-        <div className="container-reading">
+      {/* FAQ SECTION */}
+      <section className="bg-surface py-16 sm:py-24">
+        <div className="container-page max-w-3xl">
           <div className="text-center">
-            <h2 className="font-display text-4xl font-bold text-foreground sm:text-5xl">
-              Before you use ScamLens
+            <h2 className="text-3xl sm:text-4xl font-bold text-navy tracking-tight">
+              Frequently Asked Questions
             </h2>
+            <p className="mt-3 text-base text-foreground-soft">
+              Everything you need to know about checking messages safely.
+            </p>
           </div>
 
-          <div className="mt-12 divide-y divide-border rounded-2xl border border-border bg-card shadow-sm">
+          <div className="mt-10 divide-y divide-border rounded-2xl border border-border bg-white shadow-2xs">
             {FAQS.map((item) => (
-              <details key={item.q} className="group p-6 sm:p-8 cursor-pointer">
-                <summary className="flex list-none items-center justify-between gap-6 font-display text-lg font-bold text-foreground">
+              <details key={item.q} className="group p-6 cursor-pointer">
+                <summary className="flex list-none items-center justify-between gap-4 text-base font-bold text-navy">
                   <span>{item.q}</span>
                   <ChevronDown
-                    size={24}
-                    className="shrink-0 text-muted-foreground transition-transform duration-300 group-open:rotate-180"
+                    size={20}
+                    className="shrink-0 text-secondary transition-transform duration-200 group-open:rotate-180"
                     aria-hidden="true"
                   />
                 </summary>
-                <p className="mt-4 pr-8 text-base leading-relaxed text-muted-foreground">
+                <p className="mt-3 pr-6 text-sm leading-relaxed text-foreground-soft">
                   {item.a}
                 </p>
               </details>
@@ -352,22 +383,24 @@ export function LandingPage() {
       </section>
 
       {/* BOTTOM CTA */}
-      <section className="bg-primary py-20 text-on-primary">
-        <div className="container-page text-center">
-          <h2 className="font-display text-4xl font-bold sm:text-5xl">Ready to check a message?</h2>
-          <p className="mt-6 mx-auto max-w-2xl text-xl opacity-90 leading-relaxed">
-            Don't risk clicking a malicious link or giving away sensitive information.
+      <section className="bg-navy py-16 sm:py-20 text-white">
+        <div className="container-page text-center max-w-2xl">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+            Ready to check a message?
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-white/80 leading-relaxed">
+            Never risk clicking an unknown link or losing money to a fake reversal. Check it in seconds with ScamLens.
           </p>
-          <div className="mt-10">
+          <div className="mt-8 flex justify-center">
             <Link
-              to="/analyze/message"
+              to="/analyze"
               className={buttonClasses({
-                variant: "light",
                 size: "lg",
-                className: "shadow-lg text-lg px-8 py-4",
+                className: "bg-blue hover:bg-navy-dark text-white font-bold px-8 py-3.5 text-base shadow-md",
               })}
             >
-              Start Your Free Analysis
+              Start free check
+              <ArrowRight size={18} aria-hidden="true" />
             </Link>
           </div>
         </div>

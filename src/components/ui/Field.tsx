@@ -13,13 +13,17 @@ interface FieldWrapperProps {
 function FieldWrapper({ label, hint, error, htmlFor, children }: FieldWrapperProps) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="mb-1.5 block text-sm font-medium text-foreground">
+      <label htmlFor={htmlFor} className="mb-2 block text-[15px] font-semibold text-navy">
         {label}
       </label>
       {children}
-      {hint && !error && <p id={`${htmlFor}-hint`} className="mt-1.5 text-sm text-foreground-soft">{hint}</p>}
+      {hint && !error && (
+        <p id={`${htmlFor}-hint`} className="mt-2 text-sm text-text-secondary">
+          {hint}
+        </p>
+      )}
       {error && (
-        <p id={`${htmlFor}-error`} className="mt-1.5 text-sm text-destructive" role="alert">
+        <p id={`${htmlFor}-error`} className="mt-2 text-sm font-medium text-red" role="alert">
           {error}
         </p>
       )}
@@ -44,9 +48,9 @@ export function TextAreaField({ label, hint, error, className, id, ...props }: T
         aria-invalid={!!error}
         aria-describedby={describedBy}
         className={cn(
-          "w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 p-4 text-[1rem] leading-relaxed",
-          "placeholder:text-foreground-soft/60 focus:border-primary",
-          error && "border-destructive",
+          "w-full rounded-[16px] border border-border bg-white p-4 text-[16px] text-navy leading-relaxed transition-all duration-150",
+          "placeholder:text-text-secondary/70 focus:border-blue focus:outline-none focus:ring-3 focus:ring-blue/15",
+          error && "border-red focus:border-red focus:ring-red/15",
           className,
         )}
         {...props}
@@ -72,9 +76,9 @@ export function InputField({ label, hint, error, className, id, ...props }: Inpu
         aria-invalid={!!error}
         aria-describedby={describedBy}
         className={cn(
-          "tap-target w-full rounded-[var(--radius-card)] border border-border/20 bg-white/70 px-4 text-[1rem]",
-          "placeholder:text-foreground-soft/60 focus:border-primary",
-          error && "border-destructive",
+          "tap-target w-full rounded-[16px] border border-border bg-white px-4 text-[16px] text-navy min-h-[48px] transition-all duration-150",
+          "placeholder:text-text-secondary/70 focus:border-blue focus:outline-none focus:ring-3 focus:ring-blue/15",
+          error && "border-red focus:border-red focus:ring-red/15",
           className,
         )}
         {...props}

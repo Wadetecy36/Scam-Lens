@@ -6,9 +6,9 @@
 
 ---
 
-**Project:** ScamLens
-**Generated:** 2026-10-03 02:38:58
-**Category:** General
+**Project:** ScamLens ("Before you click, check.")
+**Updated:** 2026-10-04
+**Category:** Financial Security & Fraud Prevention
 
 ---
 
@@ -16,38 +16,38 @@
 
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#DC2626` | `--color-primary` |
-| On Primary | `#FFFFFF` | `--color-on-primary` |
-| Secondary | `#EF4444` | `--color-secondary` |
-| On Secondary | `#000000` | `--color-on-secondary` |
-| Accent/CTA | `#2563EB` | `--color-accent` |
-| On Accent/CTA | `#FFFFFF` | `--color-on-accent` |
-| Background | `#FFF1F2` | `--color-background` |
-| Foreground | `#0F172A` | `--color-foreground` |
-| Card | `#FFFFFF` | `--color-card` |
-| Card Foreground | `#0F172A` | `--color-card-foreground` |
-| Muted | `#FCF1F1` | `--color-muted` |
-| Muted Foreground | `#475569` | `--color-muted-foreground` |
-| Border | `#FAE4E4` | `--color-border` |
-| Destructive | `#DC2626` | `--color-destructive` |
-| On Destructive | `#FFFFFF` | `--color-on-destructive` |
-| Ring | `#DC2626` | `--color-ring` |
+| Role | Hex | CSS Variable | Usage |
+|------|-----|--------------|-------|
+| Page Background | `#FFFFFF` | `--color-background` | Base page background |
+| Secondary Surface | `#F8FAFC` | `--color-surface-secondary` | Section fills, subtle cards |
+| Primary Navy | `#071B45` | `--color-navy` | Main headings, brand text, primary structure |
+| Primary Blue | `#1463FF` | `--color-blue` / `--color-primary` | Key interactive actions, active states, highlights |
+| Dark Blue | `#0B2A63` | `--color-navy-dark` | Hover states, deep contrast |
+| Body Text | `#52627A` | `--color-text-body` | Primary readable paragraphs (16px+) |
+| Secondary Text | `#718096` | `--color-text-secondary` | Captions, metadata, helper text |
+| Border | `#E5EAF2` | `--color-border` | Standard card and input outlines |
+| Nav Border | `#E9EEF5` | `--color-border-nav` | Top header bottom separator |
+| Very Light Blue | `#F2F7FF` | `--color-blue-light` | Subtle page highlights |
+| Blue Icon Background | `#EEF5FF` | `--color-blue-icon-bg` | Active pills, icon tiles |
+| Green | `#11A66A` | `--color-green` / `--color-risk-low` | LOW risk tier, success badges |
+| Green Background | `#ECFAF4` | `--color-green-bg` | LOW risk soft surface |
+| Purple | `#7047EB` | `--color-purple` | Screenshot card tile |
+| Purple Background | `#F4F0FF` | `--color-purple-bg` | Screenshot icon background |
+| Orange | `#F97316` | `--color-orange` / `--color-risk-caution` | CAUTION / SUSPICIOUS tiers |
+| Orange Background | `#FFF3EA` | `--color-orange-bg` | CAUTION soft surface |
+| Red | `#DC2626` | `--color-red` / `--color-risk-high` | HIGH risk tier |
+| Red Background | `#FEF2F2` | `--color-red-bg` | HIGH risk soft surface |
 
-**Color Notes:** Alert red + safety blue
+**Color Notes:** Financial-security-company quality. Trustworthy, clean, modern, calm. No gradients, neon, or blobs.
 
 ### Typography
 
-- **Heading Font:** Lora
-- **Body Font:** Raleway
-- **Mood:** calm, wellness, health, relaxing, natural, organic
-- **Google Fonts:** [Lora + Raleway](https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap)
-
-**CSS Import:**
-```css
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
-```
+- **Font Family:** Inter (self-hosted via `@fontsource/inter`), falling back to `system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`.
+- **Main Heading:** Weight 700-750, 52-64px desktop, 38-44px mobile, line-height 1.05-1.1, letter-spacing -0.03em, `#071B45`.
+- **Highlighted Accent Word:** `#1463FF`.
+- **Intro Text:** 18-21px, weight 400, line-height 1.55, `#52627A`.
+- **Card Title:** 17-20px, weight 650-700, `#071B45`.
+- **Card Description:** 14-16px, `#52627A`, line-height 1.5. Never below 14px anywhere.
 
 ### Spacing Variables
 

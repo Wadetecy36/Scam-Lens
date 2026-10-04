@@ -64,23 +64,68 @@ export function AnalysisInputPage({ type, title, description, children, getInput
 
   return (
     <main className="container-page py-10 sm:py-14">
-      <Link to="/analyze" className="tap-target inline-flex items-center gap-2 text-base font-medium text-foreground-soft hover:text-primary">
-        <ArrowLeft aria-hidden="true" size={17} /> Choose another way
+      <Link
+        to="/analyze"
+        className="tap-target inline-flex items-center gap-2 text-sm font-semibold text-blue hover:underline"
+      >
+        <ArrowLeft aria-hidden="true" size={16} />
+        Back to options
       </Link>
-      <div className="mt-8 flex items-start gap-3">
-        <ShieldCheck aria-hidden="true" className="mt-1 shrink-0 text-primary" size={25} />
+
+      <div className="mt-8 flex items-start gap-3.5">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue">
+          <ShieldCheck aria-hidden="true" size={24} />
+        </div>
         <div>
-          <h1 className="mt-1 font-heading text-4xl">{title}</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-navy">{title}</h1>
+          <p className="mt-3 max-w-2xl text-base sm:text-lg leading-relaxed text-foreground-soft">
+            {description}
+          </p>
         </div>
       </div>
-      <p className="mt-4 max-w-xl text-lg text-foreground-soft">{description}</p>
-      <form onSubmit={(e) => { e.preventDefault(); submit(); }}>
-        <div className="mt-8">{children}</div>
-        {error && <div className="mt-5"><Alert tone="warning" title={error.title} action={error.retry ? <Button variant="secondary" onClick={submit}>Try again</Button> : undefined}>{error.body}</Alert></div>}
-        <Button type="submit" className="mt-6 w-full sm:w-auto" size="lg" disabled={disabled || loading} icon={loading ? <LoaderCircle aria-hidden="true" size={18} className="animate-spin" /> : undefined}>
-          {loading ? "Checking…" : "Check with ScamLens"}
-        </Button>
-        <p className="mt-4 text-sm text-foreground-soft">ScamLens gives a second opinion. It cannot guarantee that something is safe.</p>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        className="mt-8 max-w-2xl"
+      >
+        <div className="space-y-6">{children}</div>
+
+        {error && (
+          <div className="mt-6">
+            <Alert
+              tone="warning"
+              title={error.title}
+              action={
+                error.retry ? (
+                  <Button variant="secondary" onClick={submit}>
+                    Try again
+                  </Button>
+                ) : undefined
+              }
+            >
+              {error.body}
+            </Alert>
+          </div>
+        )}
+
+        <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Button
+            type="submit"
+            className="w-full sm:w-auto"
+            size="lg"
+            disabled={disabled || loading}
+            icon={loading ? <LoaderCircle aria-hidden="true" size={18} className="animate-spin" /> : undefined}
+          >
+            {loading ? "Checking with ScamLens…" : "Check with ScamLens"}
+          </Button>
+        </div>
+
+        <p className="mt-4 text-xs text-foreground-soft leading-relaxed">
+          ScamLens provides a second opinion and risk assessment. It cannot guarantee that something is safe. Never share private PINs, OTPs, or passwords.
+        </p>
       </form>
     </main>
   );
