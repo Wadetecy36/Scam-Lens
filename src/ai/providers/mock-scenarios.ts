@@ -46,6 +46,34 @@ export const MOCK_SCENARIOS: Record<string, MockScenario> = {
     confidence: 0.91,
   },
 
+  unexpected_reward: {
+    schemaVersion: 1,
+    inputType: "message",
+    category: "fake_prize",
+    riskScore: 30,
+    riskLevel: "CAUTION",
+    summary: "This message claims you won a prize, but does not ask for money or credentials.",
+    warningSigns: [
+      {
+        type: "unsolicited_prize",
+        severity: "medium",
+        explanation: "You're told you won something without entering a contest.",
+      },
+    ],
+    recommendedActions: [
+      "Pause and verify before replying.",
+      "Never pay any fee or share PINs to claim a prize.",
+    ],
+    avoidActions: ["Do not pay any claim fee.", "Do not provide banking details."],
+    explanations: {
+      technical: "The message exhibits unsolicited prize notification characteristics without explicit advance-fee demands.",
+      simple: "You're told you won a prize unexpectedly. Be cautious if they ask for money or personal details.",
+      family: "Someone is saying your family member won a prize. Worth keeping an eye on.",
+      voice: "Be careful. Never pay money to claim an unexpected prize.",
+    },
+    confidence: 0.8,
+  },
+
   fake_bank: {
     schemaVersion: 1,
     inputType: "message",
@@ -280,7 +308,8 @@ export type MockScenarioKey = keyof typeof MOCK_SCENARIOS;
 /** Very lightweight heuristic used only to pick a believable mock scenario from free text. */
 export function pickScenarioForText(text: string): MockScenarioKey {
   const t = text.toLowerCase();
-  if (/(you('ve| have)? won|winner|claim.*(prize|lottery)|lottery.*(win|winnings|claim)|congratulations.*(won|prize))/i.test(t)) return "fake_prize";
+  if (/(fee|pay|claim|transfer|urgent|link|money|\$\d|\d+\s*ghs)/i.test(t) && /(won|winner|prize|lottery)/i.test(t)) return "fake_prize";
+  if (/(you('ve| have)? won|winner|claim.*(prize|lottery)|lottery.*(win|winnings|claim)|congratulations.*(won|prize))/i.test(t)) return "unexpected_reward";
   if (/(bank.*(suspend|close|block|verify|alert|security|problem|agent)|(suspend|closed|blocked|verify).*account|otp|security code)/i.test(t)) return "fake_bank";
   if (/(delivery|package|customs).*(fee|pay|link|reschedule|failed|waiting)/i.test(t)) return "fake_delivery";
   if (/(job offer|hiring.*(urgent|fee)|work from home.*(\$|\bpay\b)|daily salary|protocol fee|enlistment)/i.test(t)) return "fake_job_offer";

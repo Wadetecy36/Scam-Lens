@@ -1,5 +1,5 @@
 import type { ScamAnalysis } from "../ai/scam-analysis/schema.js";
-import { scoreSignals } from "./scorer.js";
+import { scoreSignals, type RiskLevel } from "./scorer.js";
 import { extractAISignals } from "./ai-evidence.js";
 import type { DetectedSignal, RiskSignal } from "./signals.js";
 
@@ -448,6 +448,15 @@ export function analyzeSignals(content: string) {
   return applyCombinationRules(score, content);
 }
 
+const RISK_LEVEL_PRECEDENCE: Record<RiskLevel, number> = {
+  LOW: 0,
+  CAUTION: 1,
+  SUSPICIOUS: 2,
+  HIGH: 3,
+};
+
+const PRECEDENCE_TO_LEVEL: RiskLevel[] = ["LOW", "CAUTION", "SUSPICIOUS", "HIGH"];
+
 export function analyzeCombinedRisk(
   content: string,
   aiAnalysis: ScamAnalysis,
@@ -477,5 +486,44 @@ export function analyzeCombinedRisk(
     })),
   );
 
-  return applyCombinationRules(combined, content);
+  const deterministicCombined = applyCombinationRules(combined, content);
+
+  // MONOTONIC SAFETY RECONCILIATION:
+  // AI-derived evidence must never be silently demoted if it identifies credible danger.
+  // Deterministic hard tripwires (MoMo reversal, OTP theft, SIM threats) always hold,
+  // but AI-detected danger cannot be erased by absent or incomplete deterministic regexes.
+  const detRank = RISK_LEVEL_PRECEDENCE[deterministicCombined.level] ?? 0;
+  const aiRank = RISK_LEVEL_PRECEDENCE[aiAnalysis.riskLevel] ?? 0;
+
+  let finalScore = Math.max(deterministicCombined.score, aiAnalysis.riskScore);
+  let finalRank = Math.max(detRank, aiRank);
+
+  // Explicit benign completed payments (e.g. utility bill / rent payment without any red flags)
+  // preserve LOW risk if AI did not find credible HIGH risk evidence.
+  const isExplicitBenignPayment =
+    deterministicCombined.score === 0 &&
+    deterministicCombined.signals.length === 0 &&
+    /\b(electricity bill|rent payment|rent|bill|salary|savings account)\b/i.test(content) &&
+    aiRank < RISK_LEVEL_PRECEDENCE.HIGH;
+
+  if (isExplicitBenignPayment) {
+    finalScore = 0;
+    finalRank = RISK_LEVEL_PRECEDENCE.LOW;
+  }
+
+  // Ensure finalScore adheres to the minimum threshold for its severity level
+  const finalLevel = PRECEDENCE_TO_LEVEL[finalRank];
+  if (finalLevel === "HIGH" && finalScore < 75) {
+    finalScore = 85;
+  } else if (finalLevel === "SUSPICIOUS" && finalScore < 50) {
+    finalScore = 50;
+  } else if (finalLevel === "CAUTION" && finalScore < 25) {
+    finalScore = 25;
+  }
+
+  return {
+    score: Math.min(100, Math.max(0, finalScore)),
+    level: finalLevel,
+    signals: deterministicCombined.signals,
+  };
 }
