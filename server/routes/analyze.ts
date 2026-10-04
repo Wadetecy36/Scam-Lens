@@ -1,11 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { sendError, sendJson } from "../http.js";
 import { parseAnalyzeRequest, ValidationError } from "../validation/analyze.js";
-import { getAIProvider } from "../providers/index.js";
-import { analyzeCombinedRisk } from "../risk/engine.js";
-import { redactPII } from "../privacy/pii-redactor.js";
-import { aggregateThreatIntel } from "../threat-intel/aggregator.js";
-import type { ScamAnalysisInput } from "../../src/ai/scam-analysis/schema.js";
+import { executeAnalysisPipeline } from "../services/analysis-pipeline.js";
 
 const MAX_BODY_BYTES = 25_000;
 
@@ -40,35 +36,6 @@ async function readBody(req: IncomingMessage): Promise<unknown> {
   });
 }
 
-function toAIInput(
-  input: ReturnType<typeof parseAnalyzeRequest>,
-): ScamAnalysisInput {
-  switch (input.type) {
-    case "message":
-      return {
-        type: "message",
-        text: input.content,
-      };
-
-    case "screenshot":
-      return {
-        type: "image",
-        text: input.content,
-      };
-
-    case "url":
-      return {
-        type: "url",
-        url: input.content,
-      };
-
-    case "call":
-      return {
-        type: "call",
-        text: input.content,
-      };
-  }
-}
 
 export async function handleAnalyze(
   req: IncomingMessage,
@@ -77,108 +44,16 @@ export async function handleAnalyze(
   try {
     const body = await readBody(req);
     const input = parseAnalyzeRequest(body);
-    const content = input.content;
-
-    // PRE-FLIGHT: Prompt Injection & Jailbreak Defense Heuristics
-    // Reject obvious instruction-override attempts before paying for AI tokens.
-    const injectionPatterns = [
-      /ignore.*?instructions/i,
-      /forget.*?instructions/i,
-      /ignore.*?rules/i,
-      /ignore.*?directions/i,
-      /system prompt/i,
-      /bypass rules/i,
-      /you are now a/i,
-      /print.*?instructions/i,
-      /print.*?prompt/i
-    ];
-
-    if (injectionPatterns.some(pattern => pattern.test(content))) {
-      throw new ValidationError("Input rejected: Potential prompt injection or jailbreak attempt detected.");
-    }
-
-    const provider = getAIProvider();
-
-    // PRIVACY: scrub personal data from the copy that leaves our server.
-    // URLs are the evidence themselves, so they are sent as-is.
-    const redaction =
-      input.type === "url"
-        ? { text: content, counts: {} }
-        : redactPII(content);
-    const aiInput = toAIInput({ ...input, content: redaction.text });
-
-    const redactedTotal = Object.values(redaction.counts).reduce((a, b) => a + (b ?? 0), 0);
-    if (redactedTotal > 0) {
-      // Counts only — never log the values.
-      console.log("[privacy] redacted before AI call:", redaction.counts);
-    }
-
-    // THREAT INTEL: Query live security feeds in parallel if URL is analyzed or present
-    const urlMatch = input.type === "url" ? content : content.match(/https?:\/\/[^\s"'<>]+/i)?.[0];
-    const threatIntelPromise = urlMatch ? aggregateThreatIntel(urlMatch) : Promise.resolve([]);
-
-    const [aiAnalysis, threatIntel] = await Promise.all([
-      provider.analyzeScam(aiInput),
-      threatIntelPromise,
-    ]);
-
-    const isMaliciousUrl = threatIntel.some((t) => t.verdict === "malicious");
-    const isSuspiciousUrl = threatIntel.some((t) => t.verdict === "suspicious");
-
-    /*
-     * ScamLens owns the final risk decision.
-     *
-     * Gemini provides evidence.
-     * The deterministic risk engine calculates
-     * the final score and risk level.
-     * (It runs locally on the original text, so no evidence is lost.)
-     */
-    let risk = analyzeCombinedRisk(
-      content,
-      aiAnalysis,
+    const { analysis, threatIntel, redactions } = await executeAnalysisPipeline(
+      input.content,
+      input.type,
     );
-
-    const warningSigns = [...aiAnalysis.warningSigns];
-
-    if (isMaliciousUrl) {
-      const maliciousFinding = threatIntel.find((t) => t.verdict === "malicious");
-      risk = {
-        ...risk,
-        score: Math.max(risk.score, 95),
-        level: "HIGH" as const,
-      };
-      warningSigns.unshift({
-        type: "Known Malicious URL",
-        severity: "high" as const,
-        explanation: maliciousFinding?.details || "This link matches an active threat in global cybersecurity malware databases.",
-      });
-    } else if (isSuspiciousUrl) {
-      const suspiciousFinding = threatIntel.find((t) => t.verdict === "suspicious");
-      risk = {
-        ...risk,
-        score: Math.max(risk.score, 50),
-        level: risk.level === "LOW" ? ("CAUTION" as const) : risk.level,
-      };
-      warningSigns.push({
-        type: "Suspicious or Obfuscated Link",
-        severity: "medium" as const,
-        explanation: suspiciousFinding?.details || "This link uses shortening or redirection techniques commonly used to hide scam destinations.",
-      });
-    }
-
-    const analysis = {
-      ...aiAnalysis,
-      riskScore: risk.score,
-      riskLevel: risk.level,
-      warningSigns,
-      threatIntel: threatIntel.length > 0 ? threatIntel : undefined,
-    };
 
     sendJson(res, 200, {
       ok: true,
       analysis,
       threatIntel: threatIntel.length > 0 ? threatIntel : undefined,
-      privacy: { redactions: redaction.counts },
+      privacy: { redactions },
     });
   } catch (error) {
     if (error instanceof ValidationError) {

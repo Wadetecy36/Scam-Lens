@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { isOriginAllowed, sendError, sendJson, setCorsHeaders, handleCorsPreflight } from "./http.js";
 import { handleAnalyze } from "./routes/analyze.js";
+import { handleWhatsAppWebhook } from "./routes/whatsapp.js";
 import { checkRateLimit } from "./middleware/rate-limiter.js";
 
 /**
@@ -33,6 +34,11 @@ export async function handleRequest(
         service: "scamlens-api",
         phase: "2A",
       });
+      return;
+    }
+
+    if (path === "/api/whatsapp" || path === "/api/whatsapp/webhook") {
+      await handleWhatsAppWebhook(req, res);
       return;
     }
 

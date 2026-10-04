@@ -219,9 +219,9 @@ export function applyCombinationRules(
 
   // Mobile money fake reversal or cash-out authorization scam = HIGH.
   if (
-    /\b(momo|mobile money|telecel cash|vodafone cash|wallet)\b/i.test(content) &&
+    (/\b(momo|mobile money|telecel cash|vodafone cash|wallet|ghs|cedis?)\b/i.test(content) || has("payment_request")) &&
     (
-      /\b(mistakenly|accidentally|wrongly)\b.*\b(sent|transferred)\b/i.test(content) ||
+      /\b(mistakenly|accidentally|wrongly|mistaken)\b.*\b(sent|transferred|transfer)\b/i.test(content) ||
       /\b(reverse|reversal|send it back)\b/i.test(content) ||
       /\b(approve|authorize|enter)\b.*\b(prompt|pin)\b/i.test(content)
     )

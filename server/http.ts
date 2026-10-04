@@ -71,3 +71,25 @@ export function sendError(
     },
   });
 }
+
+export function sendXml(
+  res: ServerResponse,
+  status: number,
+  xml: string,
+) {
+  setSecurityHeaders(res);
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/xml; charset=utf-8");
+  res.end(xml);
+}
+
+export function sendText(
+  res: ServerResponse,
+  status: number,
+  text: string,
+) {
+  setSecurityHeaders(res);
+  res.statusCode = status;
+  res.setHeader("Content-Type", "text/plain; charset=utf-8");
+  res.end(text);
+}
