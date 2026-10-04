@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   CheckCircle2,
   Zap,
+  MessageCircle,
 } from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
@@ -35,6 +36,13 @@ export function ResultPage() {
 
   const { analysis } = result;
   const topAction = analysis.recommendedActions[0] ?? "Don't click, reply, or send money until you've verified it.";
+
+  const currentUrl = typeof window !== "undefined" ? window.location.href : `https://scam-lens-blue.vercel.app/result/${id}`;
+  const shareText = `⚠️ ScamLens Security Notice:\nI checked a message/link on ScamLens.\n• Risk: ${analysis.riskLevel} (${Math.round(analysis.riskScore)}/100)\n• Advice: ${topAction}\n• Why: ${analysis.explanations.simple || analysis.summary}\n\nFull check: ${currentUrl}`;
+  const whatsAppShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+  const askFamilyText = `Hi, I checked a message on ScamLens that feels suspicious:\n• Risk Level: ${analysis.riskLevel}\n• Advice: "${topAction}"\n\nCan you take a look at the full report and tell me what you think?\n${currentUrl}`;
+  const whatsAppAskFamilyUrl = `https://wa.me/?text=${encodeURIComponent(askFamilyText)}`;
 
   function save() {
     saveToHistory(analysis);
@@ -166,10 +174,44 @@ export function ResultPage() {
       <div className="mt-8 flex flex-wrap gap-3">
         <ReadAloudButton text={analysis.explanations.voice} />
         <Button variant="secondary" onClick={save} disabled={saved} icon={saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}>{saved ? "Saved" : "Save result"}</Button>
+        <a
+          href={whatsAppShareUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={buttonClasses({
+            variant: "secondary",
+            className: "inline-flex items-center gap-2 border-emerald-600/30 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-200",
+          })}
+        >
+          <MessageCircle size={18} className="text-emerald-600 dark:text-emerald-400" />
+          Share on WhatsApp
+        </a>
       </div>
 
       <section className="mt-8 rounded-[var(--radius-card)] bg-primary px-5 py-6 text-background">
-        <div className="flex items-start gap-3"><Users aria-hidden="true" className="mt-1 shrink-0" size={22} /><div><h2 className="font-heading text-xl text-background">Not sure? Ask someone you trust.</h2><p className="mt-1 text-sm text-background/80">A family member can be a second pair of eyes. This is optional.</p><Link to="/family" className={buttonClasses({ variant: "light", size: "md", className: "mt-4" })}>Ask someone you trust</Link></div></div>
+        <div className="flex items-start gap-3">
+          <Users aria-hidden="true" className="mt-1 shrink-0" size={22} />
+          <div>
+            <h2 className="font-heading text-xl text-background">Not sure? Ask someone you trust.</h2>
+            <p className="mt-1 text-sm text-background/80">
+              Forward this check directly to a trusted family member on WhatsApp for an immediate second opinion.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <a
+                href={whatsAppAskFamilyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClasses({ variant: "light", size: "md", className: "inline-flex items-center gap-1.5" })}
+              >
+                <MessageCircle size={17} className="text-emerald-700" />
+                Ask family on WhatsApp
+              </a>
+              <Link to="/family" className={buttonClasses({ variant: "light", size: "md", className: "bg-transparent text-white border-white/40 hover:bg-white/10" })}>
+                More about family safety
+              </Link>
+            </div>
+          </div>
+        </div>
       </section>
 
       <Link to="/history" className="mt-5 inline-flex tap-target items-center text-sm font-medium text-primary hover:text-primary-dark">View saved checks</Link>

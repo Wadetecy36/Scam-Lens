@@ -3,6 +3,7 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { LandingPage } from "@/pages/LandingPage";
 import { AnalyzePage } from "@/pages/AnalyzePage";
 import { MessageAnalyzePage } from "@/pages/MessageAnalyzePage";
+import { MomoAnalyzePage } from "@/pages/MomoAnalyzePage";
 import { ImageAnalyzePage } from "@/pages/ImageAnalyzePage";
 import { UrlAnalyzePage } from "@/pages/UrlAnalyzePage";
 import { CallAnalyzePage } from "@/pages/CallAnalyzePage";
@@ -26,6 +27,7 @@ const router = createBrowserRouter([
       { index: true, element: <LandingPage /> },
       { path: "analyze", element: <AnalyzePage /> },
       { path: "analyze/message", element: <MessageAnalyzePage /> },
+      { path: "analyze/momo", element: <MomoAnalyzePage /> },
       { path: "analyze/image", element: <ImageAnalyzePage /> },
       { path: "analyze/url", element: <UrlAnalyzePage /> },
       { path: "analyze/call", element: <CallAnalyzePage /> },

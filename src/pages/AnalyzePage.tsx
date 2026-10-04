@@ -1,10 +1,11 @@
-import { Camera, Link2, MessageSquare, Phone, ArrowRight } from "lucide-react";
+import { Camera, Link2, MessageSquare, Phone, Smartphone, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { buttonClasses } from "@/components/ui/button-classes";
 import { Card } from "@/components/ui/Card";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 
 const PRIMARY_OPTIONS = [
+  { to: "/analyze/momo", icon: Smartphone, title: "Mobile Money (MoMo) SMS", body: "Verify a transfer alert, fake reversal, or cash-out prompt." },
   { to: "/analyze/message", icon: MessageSquare, title: "A message", body: "Paste a text, WhatsApp message, or email." },
   { to: "/analyze/image", icon: Camera, title: "A screenshot", body: "Upload a photo of what you received." },
   { to: "/analyze/url", icon: Link2, title: "A link", body: "Paste a link before you open it." },

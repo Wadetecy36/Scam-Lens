@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { TextAreaField } from "@/components/ui/Field";
 import { AnalysisInputPage } from "@/pages/AnalysisInputPage";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
@@ -6,7 +7,19 @@ import type { ScamAnalysisInput } from "@/ai/scam-analysis/schema";
 
 export function MessageAnalyzePage() {
   useDocumentHead({ title: "Check a message", description: "Paste a suspicious text, WhatsApp message, or email into ScamLens.", path: "/analyze/message" });
-  const [text, setText] = useState("");
+  const [searchParams] = useSearchParams();
+  const [text, setText] = useState(() => {
+    const shared = searchParams.get("text") || searchParams.get("url") || searchParams.get("title");
+    return shared ? shared.trim() : "";
+  });
+
+  useEffect(() => {
+    const shared = searchParams.get("text") || searchParams.get("url") || searchParams.get("title");
+    if (shared && !text) {
+      setText(shared.trim());
+    }
+  }, [searchParams]);
+
   const invalid = text.trim().length < 10 || text.length > 10000;
   const getInput = (): ScamAnalysisInput => ({ type: "message", text: text.trim() });
   
