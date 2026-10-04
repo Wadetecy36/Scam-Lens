@@ -4,7 +4,7 @@ import {
   WARNING_SIGN_SEVERITIES,
   type ScamAnalysis,
   type WarningSign,
-} from "./schema";
+} from "./schema.js";
 
 export class ScamAnalysisValidationError extends Error {
   constructor(message: string) {

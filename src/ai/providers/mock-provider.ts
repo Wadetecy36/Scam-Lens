@@ -1,7 +1,7 @@
-import type { AIProvider } from "../scam-analysis/analyzer";
-import type { ScamAnalysis, ScamAnalysisInput } from "../scam-analysis/schema";
-import { parseScamAnalysis } from "../scam-analysis/validators";
-import { MOCK_SCENARIOS, pickScenarioForText } from "./mock-scenarios";
+import type { AIProvider } from "../scam-analysis/analyzer.js";
+import type { ScamAnalysis, ScamAnalysisInput } from "../scam-analysis/schema.js";
+import { parseScamAnalysis } from "../scam-analysis/validators.js";
+import { MOCK_SCENARIOS, pickScenarioForText } from "./mock-scenarios.js";
 
 function fakeId(): string {
   return `an_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36)}`;

@@ -1,4 +1,5 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { env } from "./env.js";
 
 export function setSecurityHeaders(res: ServerResponse) {
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -7,9 +8,22 @@ export function setSecurityHeaders(res: ServerResponse) {
   res.setHeader("Cache-Control", "no-store");
 }
 
+/**
+ * Requests with no Origin header (curl, server-to-server, same-origin GET)
+ * are not browser cross-origin calls, so they are allowed. Any request that
+ * does send an Origin must be on the allowlist.
+ */
+export function isOriginAllowed(
+  origin: string | undefined,
+  allowed: readonly string[] = env.allowedOrigins,
+): boolean {
+  if (!origin) return true;
+  return allowed.includes(origin.replace(/\/+$/, ""));
+}
+
 export function setCorsHeaders(req: IncomingMessage, res: ServerResponse) {
   const origin = req.headers.origin;
-  if (origin) {
+  if (origin && isOriginAllowed(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");

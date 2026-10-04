@@ -9,7 +9,7 @@
 export const env = {
   appEnv: (import.meta.env.VITE_APP_ENV ?? "development") as "development" | "staging" | "production",
   appUrl: import.meta.env.VITE_APP_URL ?? "http://localhost:5173",
-  apiUrl: import.meta.env.VITE_API_URL ?? "http://localhost:3001",
+  apiUrl: import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "http://localhost:3001" : ""),
   analyticsEnabled: import.meta.env.VITE_ANALYTICS_ENABLED === "true",
   /** Feature flag: real AI provider vs mock. Server decides the real switch; this only affects local dev UX. */
   useMockAnalysis: false,

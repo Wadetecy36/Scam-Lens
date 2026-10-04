@@ -1,4 +1,4 @@
-import type { ScamCategory } from "./schema";
+import type { ScamCategory } from "./schema.js";
 
 /**
  * Human-readable labels for each category. New categories can be appended to

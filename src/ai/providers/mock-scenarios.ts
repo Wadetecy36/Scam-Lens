@@ -1,4 +1,4 @@
-import type { ScamAnalysis } from "../scam-analysis/schema";
+import type { ScamAnalysis } from "../scam-analysis/schema.js";
 
 type MockScenario = Omit<ScamAnalysis, "id" | "createdAt">;
 

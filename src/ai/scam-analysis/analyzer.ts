@@ -1,4 +1,4 @@
-import type { ScamAnalysis, ScamAnalysisInput } from "./schema";
+import type { ScamAnalysis, ScamAnalysisInput } from "./schema.js";
 
 /**
  * Contract every AI provider must implement. UI and services code depend
