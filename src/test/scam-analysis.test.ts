@@ -45,8 +45,29 @@ describe("parseScamAnalysis", () => {
     expect(parseScamAnalysis(valid).riskLevel).toBe("HIGH");
   });
 
+  it("parses and preserves threatIntel evidence when provided", () => {
+    const withThreat = {
+      ...valid,
+      threatIntel: [
+        {
+          provider: "URLhaus Database",
+          verdict: "malicious",
+          threatScore: 95,
+          details: "Matches active malware threat in URLhaus",
+          checkedAt: new Date().toISOString(),
+        },
+      ],
+    };
+    const result = parseScamAnalysis(withThreat);
+    expect(result.threatIntel).toBeDefined();
+    expect(result.threatIntel).toHaveLength(1);
+    expect(result.threatIntel?.[0].provider).toBe("URLhaus Database");
+    expect(result.threatIntel?.[0].verdict).toBe("malicious");
+  });
+
   it("rejects missing or invalid fields", () => {
     expect(() => parseScamAnalysis({ ...valid, riskScore: 101 })).toThrow(ScamAnalysisValidationError);
     expect(() => parseScamAnalysis({ ...valid, explanations: {} })).toThrow(ScamAnalysisValidationError);
   });
 });
+

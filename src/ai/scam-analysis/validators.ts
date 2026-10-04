@@ -3,6 +3,7 @@ import {
   SCAM_CATEGORIES,
   WARNING_SIGN_SEVERITIES,
   type ScamAnalysis,
+  type ThreatEvidence,
   type WarningSign,
 } from "./schema.js";
 
@@ -62,6 +63,16 @@ export function parseScamAnalysis(input: unknown): ScamAnalysis {
   assert(isFiniteNumber(obj.confidence) && obj.confidence >= 0 && obj.confidence <= 1, "confidence out of range");
   assert(isString(obj.createdAt), "Missing createdAt");
 
+  let threatIntel: ThreatEvidence[] | undefined = undefined;
+  if (Array.isArray(obj.threatIntel)) {
+    const parsed = (obj.threatIntel as unknown[])
+      .map(parseThreatEvidence)
+      .filter((t): t is ThreatEvidence => t !== null);
+    if (parsed.length > 0) {
+      threatIntel = parsed;
+    }
+  }
+
   return {
     schemaVersion: 1,
     id: obj.id as string,
@@ -81,6 +92,7 @@ export function parseScamAnalysis(input: unknown): ScamAnalysis {
     },
     confidence: obj.confidence as number,
     createdAt: obj.createdAt as string,
+    threatIntel,
   };
 }
 
@@ -97,6 +109,25 @@ function parseWarningSign(input: unknown): WarningSign {
     type: obj.type as string,
     severity: obj.severity as WarningSign["severity"],
     explanation: obj.explanation as string,
+  };
+}
+
+const VALID_THREAT_VERDICTS = ["malicious", "suspicious", "clean", "unknown"] as const;
+
+function parseThreatEvidence(input: unknown): ThreatEvidence | null {
+  if (typeof input !== "object" || input === null) return null;
+  const obj = input as Record<string, unknown>;
+  if (!isString(obj.provider) || !obj.provider) return null;
+  if (typeof obj.verdict !== "string" || !VALID_THREAT_VERDICTS.includes(obj.verdict as typeof VALID_THREAT_VERDICTS[number])) {
+    return null;
+  }
+  const threatScore = typeof obj.threatScore === "number" && Number.isFinite(obj.threatScore) ? obj.threatScore : 0;
+  return {
+    provider: obj.provider,
+    verdict: obj.verdict as ThreatEvidence["verdict"],
+    threatScore,
+    details: isString(obj.details) ? obj.details : undefined,
+    checkedAt: isString(obj.checkedAt) ? obj.checkedAt : new Date().toISOString(),
   };
 }
 

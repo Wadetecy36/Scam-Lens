@@ -4,6 +4,7 @@ import { parseAnalyzeRequest, ValidationError } from "../validation/analyze.js";
 import { getAIProvider } from "../providers/index.js";
 import { analyzeCombinedRisk } from "../risk/engine.js";
 import { redactPII } from "../privacy/pii-redactor.js";
+import { aggregateThreatIntel } from "../threat-intel/aggregator.js";
 import type { ScamAnalysisInput } from "../../src/ai/scam-analysis/schema.js";
 
 const MAX_BODY_BYTES = 25_000;
@@ -112,7 +113,17 @@ export async function handleAnalyze(
       console.log("[privacy] redacted before AI call:", redaction.counts);
     }
 
-    const aiAnalysis = await provider.analyzeScam(aiInput);
+    // THREAT INTEL: Query live security feeds in parallel if URL is analyzed or present
+    const urlMatch = input.type === "url" ? content : content.match(/https?:\/\/[^\s"'<>]+/i)?.[0];
+    const threatIntelPromise = urlMatch ? aggregateThreatIntel(urlMatch) : Promise.resolve([]);
+
+    const [aiAnalysis, threatIntel] = await Promise.all([
+      provider.analyzeScam(aiInput),
+      threatIntelPromise,
+    ]);
+
+    const isMaliciousUrl = threatIntel.some((t) => t.verdict === "malicious");
+    const isSuspiciousUrl = threatIntel.some((t) => t.verdict === "suspicious");
 
     /*
      * ScamLens owns the final risk decision.
@@ -122,20 +133,51 @@ export async function handleAnalyze(
      * the final score and risk level.
      * (It runs locally on the original text, so no evidence is lost.)
      */
-    const risk = analyzeCombinedRisk(
+    let risk = analyzeCombinedRisk(
       content,
       aiAnalysis,
     );
+
+    const warningSigns = [...aiAnalysis.warningSigns];
+
+    if (isMaliciousUrl) {
+      const maliciousFinding = threatIntel.find((t) => t.verdict === "malicious");
+      risk = {
+        ...risk,
+        score: Math.max(risk.score, 95),
+        level: "HIGH" as const,
+      };
+      warningSigns.unshift({
+        type: "Known Malicious URL",
+        severity: "high" as const,
+        explanation: maliciousFinding?.details || "This link matches an active threat in global cybersecurity malware databases.",
+      });
+    } else if (isSuspiciousUrl) {
+      const suspiciousFinding = threatIntel.find((t) => t.verdict === "suspicious");
+      risk = {
+        ...risk,
+        score: Math.max(risk.score, 50),
+        level: risk.level === "LOW" ? ("CAUTION" as const) : risk.level,
+      };
+      warningSigns.push({
+        type: "Suspicious or Obfuscated Link",
+        severity: "medium" as const,
+        explanation: suspiciousFinding?.details || "This link uses shortening or redirection techniques commonly used to hide scam destinations.",
+      });
+    }
 
     const analysis = {
       ...aiAnalysis,
       riskScore: risk.score,
       riskLevel: risk.level,
+      warningSigns,
+      threatIntel: threatIntel.length > 0 ? threatIntel : undefined,
     };
 
     sendJson(res, 200, {
       ok: true,
       analysis,
+      threatIntel: threatIntel.length > 0 ? threatIntel : undefined,
       privacy: { redactions: redaction.counts },
     });
   } catch (error) {

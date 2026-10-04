@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, Users, Bookmark, BookmarkCheck, ChevronDown, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  Users,
+  Bookmark,
+  BookmarkCheck,
+  ChevronDown,
+  ShieldCheck,
+  Globe,
+  ShieldAlert,
+  CheckCircle2,
+} from "lucide-react";
 import { RiskHeader } from "@/components/risk/RiskPill";
 import { Checklist } from "@/components/ui/Checklist";
 import { Button } from "@/components/ui/Button";
@@ -49,6 +59,48 @@ export function ResultPage() {
         </div>
       </section>
 
+      {analysis.threatIntel && analysis.threatIntel.length > 0 && (
+        <section
+          className={`mt-6 rounded-[var(--radius-card)] border p-5 ${
+            analysis.threatIntel.some((t) => t.verdict === "malicious")
+              ? "border-red-300 bg-red-50/80 text-red-950 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-200"
+              : analysis.threatIntel.some((t) => t.verdict === "suspicious")
+              ? "border-amber-300 bg-amber-50/80 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200"
+              : "border-border/20 bg-foreground/5 text-foreground"
+          }`}
+          aria-labelledby="threat-intel-heading"
+        >
+          <div className="flex items-start gap-3">
+            {analysis.threatIntel.some((t) => t.verdict === "malicious") ? (
+              <ShieldAlert aria-hidden="true" className="mt-0.5 shrink-0 text-red-600 dark:text-red-400" size={24} />
+            ) : analysis.threatIntel.some((t) => t.verdict === "suspicious") ? (
+              <Globe aria-hidden="true" className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" size={24} />
+            ) : (
+              <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" size={24} />
+            )}
+            <div className="flex-1">
+              <h2 id="threat-intel-heading" className="font-heading text-lg font-semibold">
+                Threat Intelligence Database Scan
+              </h2>
+              <ul className="mt-2 space-y-2 text-sm leading-relaxed">
+                {analysis.threatIntel.map((intel, idx) => (
+                  <li key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                    <div>
+                      <span className="font-semibold">{intel.provider}</span>:{" "}
+                      <span className="capitalize font-medium">{intel.verdict}</span>
+                      {intel.details ? ` — ${intel.details}` : ""}
+                    </div>
+                    <time dateTime={intel.checkedAt} className="text-xs opacity-75 shrink-0">
+                      {new Date(intel.checkedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </time>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
+
       <section className="mt-8">
         <h2 className="font-heading text-2xl">Why we think that</h2>
         <p className="mt-3 text-[1.02rem] leading-relaxed text-foreground-soft">{analysis.explanations.simple || analysis.summary}</p>
@@ -71,6 +123,19 @@ export function ResultPage() {
           <div id="details-panel" className="mt-4 rounded-[var(--radius-card)] bg-foreground/5 p-5">
             <p className="leading-relaxed text-foreground-soft">{analysis.explanations.technical}</p>
             <p className="mt-4 text-sm text-foreground-soft">Risk score: <strong className="text-foreground">{Math.round(analysis.riskScore)}/100</strong> · Confidence: <strong className="text-foreground">{Math.round(analysis.confidence * 100)}%</strong></p>
+            {analysis.threatIntel && analysis.threatIntel.length > 0 && (
+              <div className="mt-4 border-t border-border/10 pt-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-foreground-soft">Security Database Verification</p>
+                <div className="mt-2 space-y-1.5 text-sm text-foreground-soft">
+                  {analysis.threatIntel.map((t, idx) => (
+                    <div key={idx} className="flex justify-between items-center">
+                      <span>{t.provider}</span>
+                      <span className="font-medium text-foreground capitalize">{t.verdict} (threat score: {t.threatScore}/100)</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </section>

@@ -60,6 +60,20 @@ export interface ExplanationSet {
   voice: string;
 }
 
+export type ThreatVerdict =
+  | "malicious"
+  | "suspicious"
+  | "clean"
+  | "unknown";
+
+export interface ThreatEvidence {
+  provider: string;
+  verdict: ThreatVerdict;
+  threatScore: number; // 0 to 100
+  details?: string;
+  checkedAt: string;
+}
+
 export interface ScamAnalysis {
   /** Schema/version marker for forward compatibility. */
   schemaVersion: 1;
@@ -76,6 +90,8 @@ export interface ScamAnalysis {
   /** Model's stated confidence, 0–1. Analysis must never be presented as infallible. */
   confidence: number;
   createdAt: string; // ISO timestamp
+  /** Live threat intelligence provider evidence (e.g. Presend/URLhaus), if any. */
+  threatIntel?: ThreatEvidence[];
 }
 
 export interface ScamAnalysisInput {

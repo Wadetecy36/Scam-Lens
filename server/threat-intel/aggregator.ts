@@ -1,8 +1,10 @@
 import type { ThreatEvidence, ThreatIntelligenceProvider } from "./types.js";
 import { VirusTotalProvider } from "./virustotal-provider.js";
+import { PublicThreatIntelProvider } from "./public-url-provider.js";
 import { isSafePublicUrl } from "./ssrf-guard.js";
 
 const providers: ThreatIntelligenceProvider[] = [
+  new PublicThreatIntelProvider(),
   new VirusTotalProvider(),
 ];
 
