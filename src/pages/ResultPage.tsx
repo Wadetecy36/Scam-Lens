@@ -27,11 +27,28 @@ import { track } from "@/lib/analytics";
 export function ResultPage() {
   const { id } = useParams();
   const result = id ? getResult(id) : undefined;
-  useDocumentHead({ title: result ? "Your ScamLens result" : "Result unavailable", description: result ? "See what ScamLens recommends you do next." : "This ScamLens result is no longer available in this session.", path: `/result/${id ?? "unknown"}`, index: false });
+  useDocumentHead({
+    title: result ? "Your ScamLens result" : "Result unavailable",
+    description: result
+      ? "See what ScamLens recommends you do next."
+      : "This ScamLens result is no longer available in this session.",
+    path: `/result/${id ?? "unknown"}`,
+    index: false,
+  });
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [saved, setSaved] = useState(() => !!id && listHistory().some((entry) => entry.id === id));
+
   if (!result) {
-    return <main className="container-page py-14"><Alert tone="warning" title="This result is no longer available.">Results are kept in this session only. If you refreshed the page, check it again to create a new result.</Alert><Link to="/analyze" className={buttonClasses({ className: "mt-5 inline-flex" })}>Check something</Link></main>;
+    return (
+      <main className="container-page py-14">
+        <Alert tone="warning" title="This result is no longer available.">
+          Results are kept in this session only. If you refreshed the page, check it again to create a new result.
+        </Alert>
+        <Link to="/analyze" className={buttonClasses({ className: "mt-6 inline-flex" })}>
+          Check something
+        </Link>
+      </main>
+    );
   }
 
   const { analysis } = result;
@@ -52,22 +69,29 @@ export function ResultPage() {
 
   return (
     <main className="container-page py-8 sm:py-12">
-      <Link to="/analyze" className="tap-target inline-flex items-center gap-2 text-sm font-medium text-foreground-soft hover:text-primary"><ArrowLeft aria-hidden="true" size={17} /> Check another</Link>
+      <Link
+        to="/analyze"
+        className="tap-target inline-flex items-center gap-2 text-sm font-semibold text-blue hover:underline"
+      >
+        <ArrowLeft aria-hidden="true" size={16} /> Check another
+      </Link>
 
+      {/* Main Risk Header Banner */}
       <div className="mt-6">
         <RiskHeader level={analysis.riskLevel} score={analysis.riskScore} showScale={false} />
       </div>
 
+      {/* Offline Mode Notice */}
       {analysis.id.startsWith("offline_") && (
         <aside
-          className="mt-5 rounded-[var(--radius-card)] border border-amber-200 bg-amber-50/80 p-4 text-amber-950 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-200"
+          className="mt-6 rounded-2xl border border-orange/20 bg-orange-soft p-4 sm:p-5 text-navy"
           aria-label="Offline Mode Notice"
         >
           <div className="flex items-start gap-3">
-            <Zap className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" size={19} aria-hidden="true" />
+            <Zap className="mt-0.5 shrink-0 text-orange" size={20} aria-hidden="true" />
             <div className="text-sm">
-              <strong className="font-semibold">Analyzed in Offline Safety Mode (Zero Data)</strong>
-              <p className="mt-0.5 text-xs text-amber-900/80 dark:text-amber-300/80 leading-relaxed">
+              <strong className="font-bold text-navy">Analyzed in Offline Safety Mode (Zero Mobile Data)</strong>
+              <p className="mt-1 text-xs text-foreground-soft leading-relaxed">
                 This check was computed directly on your device without internet data using local scam pattern rules. When you are back online, you can re-run this check for full AI and live cybersecurity database scans.
               </p>
             </div>
@@ -75,45 +99,53 @@ export function ResultPage() {
         </aside>
       )}
 
-      <section className="mt-8 rounded-[var(--radius-card)] border border-border/10 bg-white/60 p-5 sm:p-6" aria-labelledby="action-heading">
-        <div className="flex items-start gap-3">
-          <ShieldCheck aria-hidden="true" className="mt-0.5 shrink-0 text-primary" size={24} />
+      {/* Primary Action Guidance Card */}
+      <section className="mt-6 rounded-2xl border border-border bg-white p-6 sm:p-8 shadow-2xs" aria-labelledby="action-heading">
+        <div className="flex items-start gap-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue">
+            <ShieldCheck aria-hidden="true" size={24} />
+          </div>
           <div>
-            <h1 id="action-heading" className="font-heading text-2xl">What should I do?</h1>
-            <p className="mt-2 text-lg leading-relaxed">{topAction}</p>
+            <h1 id="action-heading" className="text-xl sm:text-2xl font-bold text-navy">
+              What should I do?
+            </h1>
+            <p className="mt-2 text-base sm:text-lg font-medium text-navy leading-relaxed">
+              {topAction}
+            </p>
           </div>
         </div>
       </section>
 
+      {/* Threat Intelligence Scan Card */}
       {analysis.threatIntel && analysis.threatIntel.length > 0 && (
         <section
-          className={`mt-6 rounded-[var(--radius-card)] border p-5 ${
+          className={`mt-6 rounded-2xl border p-5 sm:p-6 ${
             analysis.threatIntel.some((t) => t.verdict === "malicious")
-              ? "border-red-300 bg-red-50/80 text-red-950 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-200"
+              ? "border-red-200 bg-red-soft text-red"
               : analysis.threatIntel.some((t) => t.verdict === "suspicious")
-              ? "border-amber-300 bg-amber-50/80 text-amber-950 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-200"
-              : "border-border/20 bg-foreground/5 text-foreground"
+              ? "border-orange-200 bg-orange-soft text-orange"
+              : "border-border bg-surface text-navy"
           }`}
           aria-labelledby="threat-intel-heading"
         >
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3.5">
             {analysis.threatIntel.some((t) => t.verdict === "malicious") ? (
-              <ShieldAlert aria-hidden="true" className="mt-0.5 shrink-0 text-red-600 dark:text-red-400" size={24} />
+              <ShieldAlert aria-hidden="true" className="mt-0.5 shrink-0 text-red" size={24} />
             ) : analysis.threatIntel.some((t) => t.verdict === "suspicious") ? (
-              <Globe aria-hidden="true" className="mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" size={24} />
+              <Globe aria-hidden="true" className="mt-0.5 shrink-0 text-orange" size={24} />
             ) : (
-              <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" size={24} />
+              <CheckCircle2 aria-hidden="true" className="mt-0.5 shrink-0 text-green" size={24} />
             )}
             <div className="flex-1">
-              <h2 id="threat-intel-heading" className="font-heading text-lg font-semibold">
+              <h2 id="threat-intel-heading" className="text-base sm:text-lg font-bold">
                 Threat Intelligence Database Scan
               </h2>
-              <ul className="mt-2 space-y-2 text-sm leading-relaxed">
+              <ul className="mt-3 space-y-2 text-sm leading-relaxed">
                 {analysis.threatIntel.map((intel, idx) => (
-                  <li key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
+                  <li key={idx} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-t border-border/20 pt-2 first:border-0 first:pt-0">
                     <div>
-                      <span className="font-semibold">{intel.provider}</span>:{" "}
-                      <span className="capitalize font-medium">{intel.verdict}</span>
+                      <span className="font-bold">{intel.provider}</span>:{" "}
+                      <span className="capitalize font-semibold">{intel.verdict}</span>
                       {intel.details ? ` — ${intel.details}` : ""}
                     </div>
                     <time dateTime={intel.checkedAt} className="text-xs opacity-75 shrink-0">
@@ -127,36 +159,75 @@ export function ResultPage() {
         </section>
       )}
 
-      <section className="mt-8">
-        <h2 className="font-heading text-2xl">Why we think that</h2>
-        <p className="mt-3 text-[1.02rem] leading-relaxed text-foreground-soft">{analysis.explanations.simple || analysis.summary}</p>
-        <ul className="mt-5 space-y-3">
-          {analysis.warningSigns.map((sign) => (
-            <li key={`${sign.type}-${sign.explanation}`} className="flex gap-3">
-              <span className="mt-2 h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-              <div><p className="font-medium capitalize">{sign.type.replaceAll("_", " ")}</p><p className="mt-0.5 text-sm text-foreground-soft">{sign.explanation}</p></div>
-            </li>
-          ))}
-        </ul>
+      {/* Why We Think That */}
+      <section className="mt-8 rounded-2xl border border-border bg-white p-6 sm:p-8 shadow-2xs">
+        <h2 className="text-xl sm:text-2xl font-bold text-navy">Why we think that</h2>
+        <p className="mt-3 text-base sm:text-lg leading-relaxed text-foreground-soft">
+          {analysis.explanations.simple || analysis.summary}
+        </p>
+
+        {analysis.warningSigns.length > 0 && (
+          <ul className="mt-6 space-y-4 border-t border-border pt-6">
+            {analysis.warningSigns.map((sign) => (
+              <li key={`${sign.type}-${sign.explanation}`} className="flex items-start gap-3">
+                <span className="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-blue" aria-hidden="true" />
+                <div>
+                  <p className="text-base font-semibold capitalize text-navy">
+                    {sign.type.replaceAll("_", " ")}
+                  </p>
+                  <p className="mt-0.5 text-sm text-foreground-soft leading-relaxed">
+                    {sign.explanation}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      <section className="mt-8 border-t border-border/10 pt-7">
-        <button type="button" aria-expanded={detailsOpen} aria-controls="details-panel" onClick={() => setDetailsOpen((open) => !open)} className="tap-target flex w-full items-center justify-between gap-4 text-left">
-          <span><span className="block font-heading text-xl">Want more detail?</span><span className="text-sm text-foreground-soft">See the fuller explanation and technical information.</span></span>
-          <ChevronDown aria-hidden="true" size={22} className={detailsOpen ? "rotate-180 transition-transform" : "transition-transform"} />
+      {/* Technical Accordion */}
+      <section className="mt-6 rounded-2xl border border-border bg-surface-secondary/50 p-5 sm:p-6 transition-colors">
+        <button
+          type="button"
+          aria-expanded={detailsOpen}
+          aria-controls="details-panel"
+          onClick={() => setDetailsOpen((open) => !open)}
+          className="tap-target flex w-full items-center justify-between gap-4 text-left cursor-pointer"
+        >
+          <span>
+            <span className="block text-lg font-bold text-navy">Want more technical details?</span>
+            <span className="text-sm text-foreground-soft">View confidence metrics, raw model scoring, and threat scans.</span>
+          </span>
+          <ChevronDown
+            aria-hidden="true"
+            size={20}
+            className={`text-secondary transition-transform duration-200 ${detailsOpen ? "rotate-180" : ""}`}
+          />
         </button>
+
         {detailsOpen && (
-          <div id="details-panel" className="mt-4 rounded-[var(--radius-card)] bg-foreground/5 p-5">
-            <p className="leading-relaxed text-foreground-soft">{analysis.explanations.technical}</p>
-            <p className="mt-4 text-sm text-foreground-soft">Risk score: <strong className="text-foreground">{Math.round(analysis.riskScore)}/100</strong> · Confidence: <strong className="text-foreground">{Math.round(analysis.confidence * 100)}%</strong></p>
+          <div id="details-panel" className="mt-5 border-t border-border pt-5">
+            <p className="text-sm sm:text-base leading-relaxed text-foreground-soft">
+              {analysis.explanations.technical}
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4 text-xs sm:text-sm font-semibold text-foreground-soft">
+              <span>Risk score: <strong className="text-navy">{Math.round(analysis.riskScore)}/100</strong></span>
+              <span>•</span>
+              <span>Confidence: <strong className="text-navy">{Math.round(analysis.confidence * 100)}%</strong></span>
+            </div>
+
             {analysis.threatIntel && analysis.threatIntel.length > 0 && (
-              <div className="mt-4 border-t border-border/10 pt-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-foreground-soft">Security Database Verification</p>
-                <div className="mt-2 space-y-1.5 text-sm text-foreground-soft">
+              <div className="mt-4 border-t border-border pt-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-secondary">
+                  Security Database Verification
+                </p>
+                <div className="mt-2 space-y-1.5 text-xs sm:text-sm text-foreground-soft">
                   {analysis.threatIntel.map((t, idx) => (
-                    <div key={idx} className="flex justify-between items-center">
+                    <div key={idx} className="flex justify-between items-center py-1 border-b border-border/10 last:border-0">
                       <span>{t.provider}</span>
-                      <span className="font-medium text-foreground capitalize">{t.verdict} (threat score: {t.threatScore}/100)</span>
+                      <span className="font-semibold text-navy capitalize">
+                        {t.verdict} (threat score: {t.threatScore}/100)
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -166,47 +237,61 @@ export function ResultPage() {
         )}
       </section>
 
-      <section className="mt-8 grid gap-8 sm:grid-cols-2">
+      {/* Action Checklists */}
+      <section className="mt-8 grid gap-6 sm:grid-cols-2">
         <Checklist title="What to do" items={analysis.recommendedActions} tone="do" />
         <Checklist title="What not to do" items={analysis.avoidActions} tone="avoid" />
       </section>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      {/* Action Buttons Toolbar */}
+      <div className="mt-8 flex flex-wrap items-center gap-3">
         <ReadAloudButton text={analysis.explanations.voice} />
-        <Button variant="secondary" onClick={save} disabled={saved} icon={saved ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}>{saved ? "Saved" : "Save result"}</Button>
+        <Button
+          variant="secondary"
+          onClick={save}
+          disabled={saved}
+          icon={saved ? <BookmarkCheck size={18} className="text-green" /> : <Bookmark size={18} />}
+        >
+          {saved ? "Saved to history" : "Save result"}
+        </Button>
         <a
           href={whatsAppShareUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className={buttonClasses({
-            variant: "secondary",
-            className: "inline-flex items-center gap-2 border-emerald-600/30 bg-emerald-50 text-emerald-950 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-200",
-          })}
+          className="tap-target inline-flex items-center gap-2 rounded-xl border border-green/30 bg-green-soft px-4 py-2.5 text-sm font-semibold text-green hover:bg-green/10 transition-colors shadow-2xs"
         >
-          <MessageCircle size={18} className="text-emerald-600 dark:text-emerald-400" />
+          <MessageCircle size={18} aria-hidden="true" />
           Share on WhatsApp
         </a>
       </div>
 
-      <section className="mt-8 rounded-[var(--radius-card)] bg-primary px-5 py-6 text-background">
-        <div className="flex items-start gap-3">
-          <Users aria-hidden="true" className="mt-1 shrink-0" size={22} />
+      {/* Family Second Opinion Banner */}
+      <section className="mt-10 rounded-2xl bg-navy p-6 sm:p-8 text-white shadow-md">
+        <div className="flex items-start gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-white">
+            <Users aria-hidden="true" size={22} />
+          </div>
           <div>
-            <h2 className="font-heading text-xl text-background">Not sure? Ask someone you trust.</h2>
-            <p className="mt-1 text-sm text-background/80">
-              Forward this check directly to a trusted family member on WhatsApp for an immediate second opinion.
+            <h2 className="text-xl sm:text-2xl font-bold text-white">
+              Not sure? Ask someone you trust.
+            </h2>
+            <p className="mt-2 text-sm sm:text-base text-white/80 leading-relaxed max-w-xl">
+              Forward this check directly to a trusted family member or friend on WhatsApp for an immediate second opinion.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-6 flex flex-wrap gap-3">
               <a
                 href={whatsAppAskFamilyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={buttonClasses({ variant: "light", size: "md", className: "inline-flex items-center gap-1.5" })}
+                className="tap-target inline-flex items-center gap-2 rounded-xl bg-green px-5 py-3 text-sm font-bold text-white hover:bg-green/90 transition-colors shadow-sm"
               >
-                <MessageCircle size={17} className="text-emerald-700" />
+                <MessageCircle size={18} />
                 Ask family on WhatsApp
               </a>
-              <Link to="/family" className={buttonClasses({ variant: "light", size: "md", className: "bg-transparent text-white border-white/40 hover:bg-white/10" })}>
+              <Link
+                to="/family"
+                className="tap-target inline-flex items-center rounded-xl border border-white/30 bg-transparent px-5 py-3 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+              >
                 More about family safety
               </Link>
             </div>
@@ -214,8 +299,18 @@ export function ResultPage() {
         </div>
       </section>
 
-      <Link to="/history" className="mt-5 inline-flex tap-target items-center text-sm font-medium text-primary hover:text-primary-dark">View saved checks</Link>
-      <p className="mt-5 text-xs leading-relaxed text-foreground-soft">ScamLens is a second opinion and can make mistakes. For financial, account, or safety decisions, verify through an official channel you already trust.</p>
+      {/* Saved checks navigation link & footer disclaimer */}
+      <div className="mt-8 flex flex-col gap-4">
+        <Link
+          to="/history"
+          className="tap-target inline-flex items-center text-sm font-semibold text-blue hover:underline"
+        >
+          View saved checks →
+        </Link>
+        <p className="text-xs leading-relaxed text-secondary">
+          ScamLens is an AI and rules-based second opinion and can make mistakes. For financial, banking, or personal safety decisions, verify through an official telecom code (such as *170#) or an official branch.
+        </p>
+      </div>
     </main>
   );
 }

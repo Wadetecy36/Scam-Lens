@@ -11,18 +11,18 @@ export type ButtonSize = "md" | "lg";
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-on-primary hover:opacity-90 active:opacity-90 disabled:bg-muted/40",
+    "bg-blue text-white hover:bg-navy active:bg-navy-dark shadow-sm disabled:bg-border disabled:text-text-secondary",
   secondary:
-    "bg-transparent text-primary border-2 border-primary hover:bg-primary/5",
+    "bg-white text-navy border border-border hover:bg-surface-secondary hover:border-blue/40 shadow-sm",
   accent:
-    "bg-accent text-on-accent hover:opacity-90 active:opacity-90",
-  danger: "bg-destructive text-on-destructive hover:brightness-95",
-  light: "bg-background text-foreground border border-border hover:bg-background/90",
+    "bg-blue text-white hover:bg-navy active:bg-navy-dark",
+  danger: "bg-red text-white hover:brightness-95",
+  light: "bg-surface-secondary text-navy border border-border hover:bg-blue-icon-bg hover:text-blue",
 };
 
 const sizeClasses: Record<ButtonSize, string> = {
-  md: "px-5 py-2.5 text-[0.95rem]",
-  lg: "px-6 py-3.5 text-base",
+  md: "px-5 py-3 text-[15px] min-h-[48px]",
+  lg: "px-7 py-3.5 text-base min-h-[52px]",
 };
 
 /** Shared class builder so non-<button> elements (e.g. <Link>) can look like a Button. */
@@ -38,8 +38,8 @@ export function buttonClasses({
   className?: string;
 } = {}): string {
   return cn(
-    "tap-target cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-all duration-200",
-    "disabled:cursor-not-allowed disabled:opacity-80 disabled:saturate-50 disabled:bg-muted disabled:text-muted-foreground",
+    "tap-target cursor-pointer inline-flex items-center justify-center gap-2 rounded-[14px] font-semibold transition-all duration-150",
+    "disabled:cursor-not-allowed disabled:opacity-60",
     variantClasses[variant],
     sizeClasses[size],
     fullWidth && "w-full",

@@ -26,21 +26,23 @@ const LINK_GROUPS: { title: string; links: { to: string; label: string }[] }[] =
 
 export function Footer() {
   return (
-    <footer className="hairline mt-16 bg-background-dim">
-      <div className="container-page py-10">
+    <footer className="mt-20 border-t border-border bg-surface-secondary">
+      <div className="container-page py-12">
         <Logo />
-        <p className="mt-2 max-w-sm text-sm text-foreground-soft">
-          An AI safety check for suspicious messages, links, and online offers. Not a substitute for your own
-          judgment, or for reporting a scam to your bank or the police.
+        <p className="mt-3 max-w-md text-sm text-text-body leading-relaxed">
+          An advisory second-opinion tool for suspicious messages, links, and online offers in Ghana. Not a substitute for your own judgment, or for reporting a scam directly to your bank or the police.
         </p>
-        <div className="mt-8 grid grid-cols-2 gap-6">
+        <div className="mt-10 grid grid-cols-2 gap-8 sm:grid-cols-3 md:gap-12">
           {LINK_GROUPS.map((group) => (
             <div key={group.title}>
-              <p className="text-sm font-medium text-foreground">{group.title}</p>
-              <ul className="mt-2.5 space-y-2">
+              <p className="text-sm font-bold uppercase tracking-wider text-navy">{group.title}</p>
+              <ul className="mt-3.5 space-y-2.5">
                 {group.links.map((link) => (
                   <li key={link.to}>
-                    <Link to={link.to} className="tap-target inline-flex items-center text-sm text-foreground-soft hover:text-primary">
+                    <Link
+                      to={link.to}
+                      className="tap-target inline-flex items-center text-sm text-text-body transition-colors hover:text-blue"
+                    >
                       {link.label}
                     </Link>
                   </li>
@@ -49,7 +51,9 @@ export function Footer() {
             </div>
           ))}
         </div>
-        <p className="mt-10 text-xs text-foreground-soft/80">© {new Date().getFullYear()} ScamLens. Before you click, check.</p>
+        <p className="mt-12 text-xs text-text-secondary">
+          © {new Date().getFullYear()} ScamLens. Before you click, check.
+        </p>
       </div>
     </footer>
   );

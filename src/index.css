@@ -1,43 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Raleway:wght@300;400;500;600;700&display=swap');
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #DC2626;
+  --color-background: #FFFFFF;
+  --color-surface-secondary: #F8FAFC;
+  --color-navy: #071B45;
+  --color-navy-dark: #0B2A63;
+  --color-blue: #1463FF;
+  --color-blue-light: #F2F7FF;
+  --color-blue-icon-bg: #EEF5FF;
+
+  --color-text-body: #52627A;
+  --color-text-secondary: #718096;
+
+  --color-border: #E5EAF2;
+  --color-border-nav: #E9EEF5;
+
+  --color-green: #11A66A;
+  --color-green-bg: #ECFAF4;
+  --color-purple: #7047EB;
+  --color-purple-bg: #F4F0FF;
+  --color-orange: #F97316;
+  --color-orange-bg: #FFF3EA;
+  --color-red: #DC2626;
+  --color-red-bg: #FEF2F2;
+
+  /* Semantic UI Tokens */
+  --color-primary: #1463FF;
+  --color-primary-navy: #071B45;
   --color-on-primary: #FFFFFF;
-  --color-secondary: #EF4444;
-  --color-on-secondary: #000000;
-  --color-accent: #2563EB;
-  --color-on-accent: #FFFFFF;
-  --color-background: #FFF1F2;
-  --color-foreground: #0F172A;
+  --color-foreground: #071B45;
+  --color-foreground-soft: #52627A;
+  --color-foreground-muted: #718096;
+
   --color-card: #FFFFFF;
-  --color-card-foreground: #0F172A;
-  --color-muted: #FCF1F1;
-  --color-muted-foreground: #475569;
-  --color-border: #FAE4E4;
+  --color-card-foreground: #071B45;
+
   --color-destructive: #DC2626;
   --color-on-destructive: #FFFFFF;
-  --color-ring: #DC2626;
+  --color-ring: #1463FF;
 
-  --font-display: "Lora", ui-serif, Georgia, serif;
-  --font-sans: "Raleway", ui-sans-serif, system-ui, sans-serif;
+  /* Risk Tier Visual Colors */
+  --color-risk-low: #11A66A;
+  --color-risk-low-soft: #ECFAF4;
+  --color-risk-caution: #F97316;
+  --color-risk-caution-soft: #FFF3EA;
+  --color-risk-suspicious: #F97316;
+  --color-risk-suspicious-soft: #FFEAD8;
+  --color-risk-high: #DC2626;
+  --color-risk-high-soft: #FEF2F2;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-  --shadow-xl: 0 20px 25px rgba(0,0,0,0.15);
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-heading: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  --radius-card: 12px;
-  --radius-lg: 16px;
+  --shadow-sm: 0 1px 2px rgba(7, 27, 69, 0.04);
+  --shadow-md: 0 4px 12px rgba(7, 27, 69, 0.06);
+  --shadow-lg: 0 12px 24px rgba(7, 27, 69, 0.08);
+
+  --radius-card: 18px;
+  --radius-button: 12px;
   --radius-pill: 999px;
-
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
 }
 
 @layer base {
@@ -50,7 +76,7 @@
   body {
     margin: 0;
     background: var(--color-background);
-    color: var(--color-foreground);
+    color: var(--color-text-body);
     font-family: var(--font-sans);
     font-size: 1rem;
     line-height: 1.55;
@@ -59,12 +85,14 @@
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     margin: 0;
-    font-family: var(--font-display);
-    color: var(--color-foreground);
-    line-height: 1.08;
-    letter-spacing: -0.025em;
+    font-family: var(--font-heading);
+    color: var(--color-navy);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
   }
 
   button,
@@ -74,14 +102,14 @@
   }
 
   ::selection {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--color-blue-light);
+    color: var(--color-blue);
   }
 
   :focus-visible {
-    outline: 3px solid var(--color-primary);
-    outline-offset: 3px;
-    border-radius: 8px;
+    outline: 2px solid var(--color-blue);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -99,16 +127,28 @@
 @layer utilities {
   .container-page {
     width: 100%;
-    max-width: 72rem;
+    max-width: 1180px;
     margin-inline: auto;
-    padding-inline: 1.25rem;
+    padding-inline: 20px;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 32px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-page {
+      padding-inline: 40px;
+    }
   }
 
   .container-reading {
     width: 100%;
-    max-width: 44rem;
+    max-width: 720px;
     margin-inline: auto;
-    padding-inline: 1.25rem;
+    padding-inline: 20px;
   }
 
   .hairline {
@@ -128,7 +168,7 @@
 @keyframes settle-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(8px);
   }
 
   to {
@@ -138,9 +178,5 @@
 }
 
 .animate-settle {
-  animation: settle-in 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-.soft-shadow {
-  box-shadow: var(--shadow-md);
+  animation: settle-in 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }

@@ -1,48 +1,91 @@
+import { Link } from "react-router-dom";
+import { ArrowLeft, Smartphone, ShoppingBag, Users } from "lucide-react";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
+import { buttonClasses } from "@/components/ui/button-classes";
 
 export function LearnPage() {
   useDocumentHead({
     title: "Common scams",
-    description: "Learn about the most common scams targeting mobile money and bank accounts.",
+    description: "Learn about the most common scams targeting mobile money and bank accounts in Ghana.",
     path: "/learn",
   });
 
   return (
     <main className="container-reading py-10 sm:py-14">
-      <h1 className="font-heading text-4xl text-foreground">Common scams</h1>
-      <div className="mt-6 space-y-8 text-foreground-soft text-lg">
-        <p>
-          Fraudsters are constantly inventing new ways to trick people, but many scams follow the same patterns. Here are some of the most common ones to look out for.
+      <Link
+        to="/"
+        className="tap-target inline-flex items-center gap-2 text-sm font-semibold text-blue hover:underline"
+      >
+        <ArrowLeft size={16} /> Back home
+      </Link>
+
+      <div className="mt-8">
+        <div className="inline-flex items-center gap-2 rounded-full border border-orange/20 bg-orange-soft px-3.5 py-1 text-xs font-semibold text-orange mb-3">
+          Awareness Guide
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-navy">Common Scams in Ghana</h1>
+        <p className="mt-3 text-base sm:text-lg text-foreground-soft leading-relaxed">
+          Fraudsters use emotional pressure, urgency, and impersonation. Recognizing these patterns keeps you and your family safe.
         </p>
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">Mobile money fraud</h2>
-          <p className="mt-2">
-            Someone calls or sends a message pretending to be mobile money staff. They might say your account is blocked, or that you won a prize. They will then ask for your PIN to "help" you or to process your winnings.
-          </p>
-          <p className="mt-2 font-medium text-foreground">
-            What to do: Hang up. Real mobile money staff will never ask for your PIN.
-          </p>
+      </div>
+
+      <div className="mt-10 space-y-6">
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-soft text-orange">
+              <Smartphone size={22} aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-navy">Fake Mobile Money Reversals</h2>
+              <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+                A scammer sends an SMS made to look like an official MTN MoMo or Telecel Cash transfer alert from a personal phone number. Seconds later, they call begging you to refund the money "sent by mistake."
+              </p>
+              <div className="mt-4 rounded-xl border border-border bg-surface-secondary p-3.5 text-xs sm:text-sm font-semibold text-navy">
+                <span className="text-blue">What to do:</span> Never send money back based on an SMS. Dial *170# or *110# directly to check your real balance. If someone made a mistake, tell them to contact the telecom provider to request an official reversal.
+              </div>
+            </div>
+          </div>
         </section>
-        
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">Fake online shops</h2>
-          <p className="mt-2">
-            You see an advert for a very cheap item on social media. The seller asks you to send money first before they deliver the item. After you pay, they block you and you never receive the goods.
-          </p>
-          <p className="mt-2 font-medium text-foreground">
-            What to do: Pay only on delivery, or buy from people and shops you know and trust.
-          </p>
+
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-purple-soft text-purple">
+              <ShoppingBag size={22} aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-navy">Fake Online Shops & Delivery Fees</h2>
+              <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+                You see discounted electronics, phones, or clothing on Instagram, TikTok, or WhatsApp. The seller demands payment or a "customs clearance fee" upfront via MoMo. Once you pay, they block you immediately.
+              </p>
+              <div className="mt-4 rounded-xl border border-border bg-surface-secondary p-3.5 text-xs sm:text-sm font-semibold text-navy">
+                <span className="text-blue">What to do:</span> Pay cash or MoMo only upon delivery and inspection of the goods, or buy from verified sellers you already know and trust.
+              </div>
+            </div>
+          </div>
         </section>
-        
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">The fake emergency</h2>
-          <p className="mt-2">
-            You get a message from an unknown number claiming to be a family member or friend. They say they have lost their phone, are in trouble, and need you to send money immediately.
-          </p>
-          <p className="mt-2 font-medium text-foreground">
-            What to do: Call the person on their normal number to check if it is really them before you send any money.
-          </p>
+
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-soft text-red">
+              <Users size={22} aria-hidden="true" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-navy">The Fake Family Emergency</h2>
+              <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+                You get an urgent message or call claiming to be your child, grandchild, or nephew. They claim they were arrested, had an accident, or lost their wallet, and need funds sent immediately to a strange MoMo number.
+              </p>
+              <div className="mt-4 rounded-xl border border-border bg-surface-secondary p-3.5 text-xs sm:text-sm font-semibold text-navy">
+                <span className="text-blue">What to do:</span> Pause and hang up. Call that relative on their known phone number, or call another family member to confirm their location before sending any money.
+              </div>
+            </div>
+          </div>
         </section>
+      </div>
+
+      <div className="mt-10 flex">
+        <Link to="/analyze" className={buttonClasses({ size: "lg" })}>
+          Check a suspicious message
+        </Link>
       </div>
     </main>
   );

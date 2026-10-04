@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+import { ArrowLeft, FileText } from "lucide-react";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 
 export function TermsPage() {
@@ -9,31 +11,43 @@ export function TermsPage() {
 
   return (
     <main className="container-reading py-10 sm:py-14">
-      <h1 className="font-heading text-4xl text-foreground">Terms of service</h1>
+      <Link
+        to="/"
+        className="tap-target inline-flex items-center gap-2 text-sm font-semibold text-blue hover:underline"
+      >
+        <ArrowLeft size={16} /> Back home
+      </Link>
+
+      <div className="mt-8 flex items-center gap-3.5">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-icon-bg text-blue">
+          <FileText aria-hidden="true" size={24} />
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-navy">Terms of Service</h1>
+      </div>
       
-      <div className="mt-8 space-y-8 text-foreground-soft text-lg">
+      <div className="mt-8 space-y-6 text-base sm:text-lg leading-relaxed text-foreground-soft">
         <p>
-          By using ScamLens, you agree to these basic rules. Please read them carefully.
+          By using ScamLens, you agree to these clear guidelines.
         </p>
 
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">Use ScamLens as a guide only</h2>
-          <p className="mt-2">
-            ScamLens offers advice based on common fraud patterns. It is a guide, not a guarantee. We cannot promise that every safe result is truly safe, or that every dangerous result is truly a scam. You must still use your own judgment.
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <h2 className="text-xl font-bold text-navy">Second Opinion Only</h2>
+          <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+            ScamLens is an automated informational guide designed to help identify known scam patterns. It is not an absolute financial or legal guarantee. A low-risk result does not guarantee complete legitimacy, and you should always confirm financial transfers through official channels.
           </p>
         </section>
 
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">Your responsibility</h2>
-          <p className="mt-2">
-            You are responsible for the choices you make. If you are unsure about a message or an offer, you should verify it yourself. Contact the bank, business, or government office directly using a phone number you know is correct.
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <h2 className="text-xl font-bold text-navy">User Responsibility</h2>
+          <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+            You remain responsible for your own financial transactions, payments, and account security. When in doubt, dial your telecom's official short code (*170#, *110#, *500#) or visit a local branch.
           </p>
         </section>
 
-        <section>
-          <h2 className="font-heading text-2xl text-foreground">No secret information</h2>
-          <p className="mt-2">
-            You agree never to submit sensitive credentials. This includes passwords, mobile money PINs, bank card numbers, or temporary login codes.
+        <section className="rounded-2xl border border-border bg-white p-6 sm:p-7 shadow-2xs">
+          <h2 className="text-xl font-bold text-navy">No Confidential Credentials</h2>
+          <p className="mt-2 text-sm sm:text-base text-foreground-soft leading-relaxed">
+            You agree never to submit sensitive passwords, PINs, or security answers to ScamLens.
           </p>
         </section>
       </div>
