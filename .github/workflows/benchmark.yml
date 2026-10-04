@@ -31,7 +31,7 @@ jobs:
         run: npm ci
 
       - name: Run Python Invariant Simulation (10 Loops)
-        run: python scratch/fraud-engine/run_benchmark.py
+        run: python benchmarks/fraud-engine/run_benchmark.py
 
       - name: Run Production Pipeline Benchmark (30 Cases)
         run: npx vitest run server/risk/pipeline-benchmark.test.ts server/risk/benchmark.test.ts
